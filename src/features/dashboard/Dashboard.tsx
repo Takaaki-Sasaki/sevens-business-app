@@ -9,8 +9,9 @@ import { SalesHistoryPage } from '../sales/SalesHistoryPage';
 import { getTodaySalesSummary } from '../sales/saleApi';
 import { InvoicePage } from '../invoices/InvoicePage';
 import { DocumentsPage } from '../documents/DocumentsPage';
+import { UserManagementPage } from '../users/UserManagementPage';
 
-export type AppRoute = 'home' | 'pos' | 'sales' | 'customers' | 'products' | 'invoices' | 'documents';
+export type AppRoute = 'home' | 'pos' | 'sales' | 'customers' | 'products' | 'invoices' | 'documents' | 'users';
 
 type DashboardProps = {
   profile: Profile;
@@ -41,7 +42,7 @@ const navigation: NavigationItem[] = [
 
 const adminNavigation: NavigationItem[] = [
   { label: 'マスタ管理', description: '共通マスタを管理', permission: 'settings.write' },
-  { label: 'ユーザー管理', description: '利用者を管理', permission: 'users.manage' },
+  { label: 'ユーザー管理', description: '利用者を管理', permission: 'users.manage', route: 'users' },
 ];
 
 export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataVersion, onCustomersChanged }: DashboardProps) {
@@ -92,7 +93,7 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
       </aside>
 
       <main className="main-content">
-        {route === 'customers' ? <CustomerPage profile={profile} onCustomersChanged={onCustomersChanged} /> : route === 'products' ? <ProductPage profile={profile} /> : route === 'pos' ? <PosPage profile={profile} /> : route === 'sales' ? <SalesHistoryPage profile={profile} /> : route === 'invoices' ? <InvoicePage profile={profile} /> : route === 'documents' ? <DocumentsPage profile={profile} /> : (
+        {route === 'customers' ? <CustomerPage profile={profile} onCustomersChanged={onCustomersChanged} /> : route === 'products' ? <ProductPage profile={profile} /> : route === 'pos' ? <PosPage profile={profile} /> : route === 'sales' ? <SalesHistoryPage profile={profile} /> : route === 'invoices' ? <InvoicePage profile={profile} /> : route === 'documents' ? <DocumentsPage profile={profile} /> : route === 'users' ? <UserManagementPage profile={profile} /> : (
           <>
         <header className="page-header">
           <div>
@@ -118,13 +119,14 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
         )}
       </main>
 
-      <nav className="mobile-navigation" aria-label="モバイルメニュー">
+      <nav className={hasPermission(profile.role, 'users.manage') ? 'mobile-navigation with-admin' : 'mobile-navigation'} aria-label="モバイルメニュー">
         {[
           { label: 'ホーム', route: 'home' as AppRoute },
           { label: 'レジ', route: 'pos' as AppRoute },
           { label: '顧客', route: 'customers' as AppRoute },
           { label: '売上', route: 'sales' as AppRoute },
           { label: '請求', route: 'invoices' as AppRoute },
+          ...(hasPermission(profile.role, 'users.manage') ? [{ label: '管理', route: 'users' as AppRoute }] : []),
         ].map((item) => (
           <button key={item.label} type="button" className={item.route === route ? 'active' : ''} disabled={!item.route} onClick={() => item.route && onNavigate(item.route)}>{item.label}</button>
         ))}
