@@ -1,0 +1,12 @@
+-- 初期管理者がSupabase Authで作成・招待された後に、SQL Editorで一度だけ実行する。
+-- <> を実際のメールアドレスに置き換える。メールアドレスは小文字で指定する。
+
+update public.profiles
+set role = 'admin'
+where email = '<admin@example.com>'
+  and organization_id = (select id from public.organizations where slug = 'sevens');
+
+-- 確認用
+select email, display_name, role, active
+from public.profiles
+order by created_at;

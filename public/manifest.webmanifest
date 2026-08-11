@@ -1,0 +1,16 @@
+{
+  "name": "SEVENS 統合業務アプリ",
+  "short_name": "SEVENS",
+  "lang": "ja",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#11110f",
+  "theme_color": "#11110f",
+  "icons": [
+    {
+      "src": "/icons/sevens-logo.png",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
