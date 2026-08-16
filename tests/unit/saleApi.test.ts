@@ -1,16 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { createCheckoutPayload } from '../../src/features/sales/saleApi';
-import type { CartLine } from '../../src/features/pos/cart';
-import type { Product } from '../../src/features/products/types';
+import { createCustomCartLine, type CartLine } from '../../src/features/pos/cart';
+import type { Product, TaxRate } from '../../src/features/products/types';
 
 const product: Product = {
   id: '0af7b6d8-3d91-4a45-a55b-270c1d48f599', organization_id: 'org', product_code: 'P001', name: 'タイヤ交換', category_id: 'tire', tax_rate_id: 'tax', price_yen: 1800, active: true, sort_order: 10, deleted_at: null, created_at: '', updated_at: '',
 };
 
 const line: CartLine = {
-  id: product.id, product, quantity_milli: 2500, unit_price_yen: 1800, discount_yen: 100,
+  id: product.id, line_kind: 'catalog', product, quantity_milli: 2500, unit_price_yen: 1800, discount_yen: 100,
   tax_rate_id: 'tax', tax_rate_name: '標準税率', tax_rate_basis_points: 1000,
 };
+const taxRate: TaxRate = { id: 'tax', name: '標準税率', rate_basis_points: 1000, active: true, sort_order: 10 };
 
 describe('売上確定リクエスト', () => {
   it('会計用の再送キーと、金額計算に必要な最小の明細だけを送信する', () => {
@@ -57,5 +58,27 @@ describe('売上確定リクエスト', () => {
     const retry = createCheckoutPayload(input);
     expect(retry.p_idempotency_key).toBe(first.p_idempotency_key);
     expect(retry.p_lines).toEqual(first.p_lines);
+  });
+
+  it('その他の自由入力明細は商品IDを送らず、名称と税率を送信する', () => {
+    const customLine = createCustomCartLine({
+      id: 'f140078e-23b0-4471-9b85-56f4a880d4de',
+      name: '緊急出張作業',
+      unit_price_yen: 3500,
+      taxRate,
+    });
+    const payload = createCheckoutPayload({
+      idempotencyKey: '8d177c7e-241f-4a56-8562-8ef8e0e372dd',
+      paymentMethodId: '4f9d5ac3-976c-4b10-a97c-0d0f60e351f8',
+      lines: [customLine],
+    });
+    expect(payload.p_lines).toEqual([{
+      product_id: null,
+      custom_item_name: '緊急出張作業',
+      tax_rate_id: 'tax',
+      quantity_milli: 1000,
+      unit_price_yen: 3500,
+      discount_yen: 0,
+    }]);
   });
 });

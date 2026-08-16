@@ -7,7 +7,7 @@ import { categoryPath } from '../products/categoryTree';
 import { getTaxRoundingMode, listActiveCategories, listActiveProducts, listPaymentMethods, listTaxRates } from '../products/productApi';
 import type { PaymentMethod, Product, ProductCategory, TaxRate } from '../products/types';
 import { CartPanel } from './CartPanel';
-import { addProductToCart, calculateCart, calculateCashSettlement, formatQuantity, parseYen, type CartLine, type TaxRoundingMode, updateCartLine } from './cart';
+import { addProductToCart, calculateCart, calculateCashSettlement, createCustomCartLine, formatQuantity, parseYen, type CartLine, type TaxRoundingMode, updateCartLine } from './cart';
 import { CustomerSelector } from './CustomerSelector';
 import { PaymentPanel } from './PaymentPanel';
 import { PosCategoryPanel } from './PosCategoryPanel';
@@ -17,6 +17,7 @@ import { VehicleSelector } from './VehicleSelector';
 import { checkoutSale } from '../sales/saleApi';
 import type { SaleCheckoutResult } from '../sales/types';
 import { toUserMessage } from '../../shared/lib/userError';
+import { OtherItemForm } from './OtherItemForm';
 
 export function PosPage({ profile }: { profile: Profile }) {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
@@ -35,6 +36,7 @@ export function PosPage({ profile }: { profile: Profile }) {
   const [amountReceivedInput, setAmountReceivedInput] = useState('');
   const [createInvoice, setCreateInvoice] = useState(false);
   const [isCustomerFormOpen, setCustomerFormOpen] = useState(false);
+  const [isOtherItemFormOpen, setOtherItemFormOpen] = useState(false);
   const [checkoutKey, setCheckoutKey] = useState(() => crypto.randomUUID());
   const [isCheckingOut, setCheckingOut] = useState(false);
   const [completedSale, setCompletedSale] = useState<SaleCheckoutResult>();
@@ -162,7 +164,14 @@ export function PosPage({ profile }: { profile: Profile }) {
       {error && <p className="form-error page-error" role="alert">{error}</p>}
 
       <div className="pos-workspace">
-        <PosCategoryPanel roots={roots} selectedId={currentCategoryId} onSelect={selectCategory} />
+        <PosCategoryPanel
+          roots={roots}
+          selectedId={currentCategoryId}
+          onSelect={selectCategory}
+          onChooseOther={() => {
+            if (!isCheckingOut) setOtherItemFormOpen(true);
+          }}
+        />
         {loading ? <section className="panel pos-loading"><p>商品カタログを読み込んでいます…</p></section> : (
           <ProductBrowser
             categories={categories}
@@ -274,6 +283,22 @@ export function PosPage({ profile }: { profile: Profile }) {
                 setSelectedCustomer(customer);
                 setSelectedVehicleId(undefined);
                 setCustomerFormOpen(false);
+                invalidateCheckout();
+              }}
+            />
+          </section>
+        </div>
+      )}
+      {isOtherItemFormOpen && (
+        <div className="modal-backdrop" role="presentation">
+          <section className="modal-panel other-item-modal" role="dialog" aria-modal="true" aria-labelledby="other-item-title">
+            <OtherItemForm
+              taxRates={taxRates}
+              onClose={() => setOtherItemFormOpen(false)}
+              onAdd={({ name, unitPriceYen, taxRate }) => {
+                setCartLines((lines) => [...lines, createCustomCartLine({ id: crypto.randomUUID(), name, unit_price_yen: unitPriceYen, taxRate })]);
+                setError(null);
+                setOtherItemFormOpen(false);
                 invalidateCheckout();
               }}
             />

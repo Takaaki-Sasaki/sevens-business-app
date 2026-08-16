@@ -26,7 +26,7 @@ export function CartPanel({ totals, allowPriceOverride, onUpdate, onRemove, onCl
               <div className="cart-line-heading">
                 <div>
                   <strong>{line.product.name}</strong>
-                  <p>{line.product.product_code} ・ {line.tax_rate_name}（{line.tax_rate_basis_points / 100}%）</p>
+                  <p>{line.line_kind === 'custom' ? 'その他（自由入力）' : line.product.product_code} ・ {line.tax_rate_name}（{line.tax_rate_basis_points / 100}%）</p>
                 </div>
                 <button type="button" className="danger-button" onClick={() => onRemove(line.id)}>削除</button>
               </div>

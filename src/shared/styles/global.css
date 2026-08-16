@@ -324,6 +324,7 @@ h2 { font-size: 21px; }
 
 .form-actions p { max-width: 62%; margin: 0; color: #8f8779; font-size: 12px; line-height: 1.55; }
 .form-actions .primary-button { min-height: 42px; }
+.master-form-button-group { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 
 .vehicle-manager { padding: 24px 21px; border-top: 1px solid #3b362c; }
 .subsection-heading { margin-bottom: 15px; }
@@ -516,6 +517,8 @@ h2 { font-size: 21px; }
   text-align: left;
 }
 .pos-category-button:hover, .pos-category-button.selected { border-color: #d8a83f; color: #1e170a; background: #d8a83f; opacity: 1; }
+.pos-category-button.other { border-style: dashed; border-color: #b98b36; color: #efd182; background: rgba(185, 139, 54, .12); }
+.pos-category-button.other:hover { border-style: solid; border-color: #efc461; color: #201806; background: #d8a83f; }
 .pos-product-browser { min-height: 540px; padding-bottom: 20px; }
 .pos-product-header, .pos-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .pos-product-header { padding: 21px 21px 0; }
@@ -640,6 +643,11 @@ h2 { font-size: 21px; }
 
 .modal-backdrop { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(0, 0, 0, .68); backdrop-filter: blur(3px); }
 .modal-panel { position: relative; width: min(100%, 660px); max-height: min(90vh, 840px); overflow: auto; border: 1px solid #76603a; border-radius: 15px; background: #211f1a; box-shadow: 0 25px 85px rgba(0, 0, 0, .52); }
+.other-item-modal { width: min(100%, 560px); }
+.other-item-form { padding: 0 21px 23px; }
+.other-item-form .panel-heading { padding: 21px 0 12px; }
+.other-item-description, .other-item-note { margin: 0 0 16px; color: #aaa292; font-size: 12px; line-height: 1.6; }
+.other-item-note { margin-top: 14px; margin-bottom: 0; color: #c5b487; }
 .customer-create-modal .customer-form { padding: 0 25px 25px; }
 .customer-create-modal .customer-form .panel-heading { padding-top: 26px; }
 .modal-close { position: absolute; z-index: 1; top: 12px; right: 12px; width: 33px; height: 33px; border: 1px solid #635942; border-radius: 8px; color: #d8cfbf; background: #28251e; font-size: 21px; line-height: 1; }
@@ -951,7 +959,7 @@ h2 { font-size: 21px; }
     line-height: 1.2;
   }
   .mobile-navigation button.active { color: #efc461; font-weight: 800; opacity: 1; }
-  .mobile-navigation.with-admin { grid-template-columns: repeat(6, 1fr); }
+  .mobile-navigation.with-admin { grid-template-columns: repeat(7, 1fr); }
   .primary-button, .secondary-button, .danger-button { min-height: 44px; }
   .text-button { min-height: 40px; }
   .field input, .field select, .search-field input, .product-filters select { min-height: 44px; }

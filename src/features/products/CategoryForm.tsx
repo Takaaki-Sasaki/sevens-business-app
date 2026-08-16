@@ -11,6 +11,7 @@ type CategoryFormProps = {
   category?: ProductCategory;
   initialParentId?: string;
   onSaved: (category: ProductCategory) => void;
+  onArchived?: () => Promise<void>;
 };
 
 const blankCategory: CategoryInput = { name: '', parent_id: '', sort_order: '0', active: true };
@@ -25,10 +26,11 @@ function toInput(category?: ProductCategory, initialParentId?: string): Category
   };
 }
 
-export function CategoryForm({ organizationId, categories, category, initialParentId, onSaved }: CategoryFormProps) {
+export function CategoryForm({ organizationId, categories, category, initialParentId, onSaved, onArchived }: CategoryFormProps) {
   const [input, setInput] = useState<CategoryInput>(() => toInput(category, initialParentId));
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [archiving, setArchiving] = useState(false);
   const forbiddenParentIds = useMemo(() => category ? new Set([category.id, ...descendantsOf(category.id, categories)]) : new Set<string>(), [category, categories]);
 
   useEffect(() => {
@@ -59,6 +61,21 @@ export function CategoryForm({ organizationId, categories, category, initialPare
       setError(toUserMessage(caught, { fallback: 'カテゴリを保存できませんでした。', retryAction: 'カテゴリを保存' }));
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleArchive() {
+    if (!category || !onArchived) return;
+    const message = `カテゴリ「${category.name}」と、その配下のカテゴリ・商品を削除します。過去の売上や請求書は変更されません。よろしいですか？`;
+    if (!window.confirm(message)) return;
+    setArchiving(true);
+    setError(null);
+    try {
+      await onArchived();
+    } catch (caught) {
+      setError(toUserMessage(caught, { fallback: 'カテゴリを削除できませんでした。', retryAction: 'カテゴリを削除' }));
+    } finally {
+      setArchiving(false);
     }
   }
 
@@ -95,8 +112,11 @@ export function CategoryForm({ organizationId, categories, category, initialPare
       </div>
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="form-actions">
-        <p>カテゴリは物理削除しません。不要になった場合は「有効」を外してください。</p>
-        <button className="primary-button" type="submit" disabled={saving}>{saving ? '保存中…' : 'カテゴリを保存'}</button>
+        <p>削除すると、このカテゴリ配下のカテゴリ・商品をレジから除外します。過去の売上・請求データは変わりません。</p>
+        <div className="master-form-button-group">
+          {category && onArchived && <button className="danger-button" type="button" disabled={saving || archiving} onClick={() => void handleArchive()}>{archiving ? '削除中…' : 'カテゴリツリーを削除'}</button>}
+          <button className="primary-button" type="submit" disabled={saving || archiving}>{saving ? '保存中…' : 'カテゴリを保存'}</button>
+        </div>
       </div>
     </form>
   );

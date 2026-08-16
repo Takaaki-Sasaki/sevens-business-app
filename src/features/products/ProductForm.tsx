@@ -11,6 +11,7 @@ type ProductFormProps = {
   taxRates: TaxRate[];
   product?: Product;
   onSaved: (product: Product) => void;
+  onArchived?: () => Promise<void>;
 };
 
 function toInput(product: Product | undefined, defaultTaxRateId: string): ProductInput {
@@ -28,12 +29,13 @@ function toInput(product: Product | undefined, defaultTaxRateId: string): Produc
   };
 }
 
-export function ProductForm({ organizationId, categories, taxRates, product, onSaved }: ProductFormProps) {
+export function ProductForm({ organizationId, categories, taxRates, product, onSaved, onArchived }: ProductFormProps) {
   const selectableCategories = useMemo(() => leafCategories(categories).filter((category) => category.active), [categories]);
   const defaultTaxRateId = taxRates[0]?.id || '';
   const [input, setInput] = useState<ProductInput>(() => toInput(product, defaultTaxRateId));
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [archiving, setArchiving] = useState(false);
   const isNew = !product;
 
   useEffect(() => {
@@ -65,6 +67,20 @@ export function ProductForm({ organizationId, categories, taxRates, product, onS
       setError(toUserMessage(caught, { fallback: '商品を保存できませんでした。', retryAction: '商品を保存' }));
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleArchive() {
+    if (!product || !onArchived) return;
+    if (!window.confirm(`商品「${product.name}」を削除します。過去の売上や請求書は変更されません。よろしいですか？`)) return;
+    setArchiving(true);
+    setError(null);
+    try {
+      await onArchived();
+    } catch (caught) {
+      setError(toUserMessage(caught, { fallback: '商品を削除できませんでした。', retryAction: '商品を削除' }));
+    } finally {
+      setArchiving(false);
     }
   }
 
@@ -118,8 +134,11 @@ export function ProductForm({ organizationId, categories, taxRates, product, onS
       {selectableCategories.length === 0 && <p className="form-error">先に、商品を登録する末端カテゴリを作成してください。</p>}
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="form-actions">
-        <p>商品コードは手入力または自動採番です。売上登録後に価格を変更しても過去の売上額は変わりません。</p>
-        <button className="primary-button" type="submit" disabled={saving || selectableCategories.length === 0}>{saving ? '保存中…' : isNew ? '商品を登録' : '変更を保存'}</button>
+        <p>商品コードは手入力または自動採番です。削除しても、過去の売上・請求データは変わりません。</p>
+        <div className="master-form-button-group">
+          {product && onArchived && <button className="danger-button" type="button" disabled={saving || archiving} onClick={() => void handleArchive()}>{archiving ? '削除中…' : '商品を削除'}</button>}
+          <button className="primary-button" type="submit" disabled={saving || archiving || selectableCategories.length === 0}>{saving ? '保存中…' : isNew ? '商品を登録' : '変更を保存'}</button>
+        </div>
       </div>
     </form>
   );

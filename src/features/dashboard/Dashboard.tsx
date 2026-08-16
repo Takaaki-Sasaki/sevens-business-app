@@ -119,13 +119,14 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
         )}
       </main>
 
-      <nav className={hasPermission(profile.role, 'users.manage') ? 'mobile-navigation with-admin' : 'mobile-navigation'} aria-label="モバイルメニュー">
+      <nav className={isAdmin ? 'mobile-navigation with-admin' : 'mobile-navigation'} aria-label="モバイルメニュー">
         {[
           { label: 'ホーム', route: 'home' as AppRoute },
           { label: 'レジ', route: 'pos' as AppRoute },
           { label: '顧客', route: 'customers' as AppRoute },
           { label: '売上', route: 'sales' as AppRoute },
           { label: '請求', route: 'invoices' as AppRoute },
+          ...(hasPermission(profile.role, 'products.read') ? [{ label: '商品', route: 'products' as AppRoute }] : []),
           ...(hasPermission(profile.role, 'users.manage') ? [{ label: '管理', route: 'users' as AppRoute }] : []),
         ].map((item) => (
           <button key={item.label} type="button" className={item.route === route ? 'active' : ''} disabled={!item.route} onClick={() => item.route && onNavigate(item.route)}>{item.label}</button>

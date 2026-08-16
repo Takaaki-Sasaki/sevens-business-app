@@ -4,6 +4,7 @@ export type TaxRoundingMode = 'floor' | 'round' | 'ceil';
 
 export type CartLine = {
   id: string;
+  line_kind: 'catalog' | 'custom';
   product: Product;
   quantity_milli: number;
   unit_price_yen: number;
@@ -84,6 +85,7 @@ export function parseYen(value: string): number | null {
 export function createCartLine(product: Product, taxRate: TaxRate): CartLine {
   return {
     id: product.id,
+    line_kind: 'catalog',
     product,
     quantity_milli: QUANTITY_SCALE,
     unit_price_yen: product.price_yen,
@@ -94,8 +96,45 @@ export function createCartLine(product: Product, taxRate: TaxRate): CartLine {
   };
 }
 
+export function createCustomCartLine(input: {
+  id: string;
+  name: string;
+  unit_price_yen: number;
+  taxRate: TaxRate;
+}): CartLine {
+  const name = input.name.trim();
+  if (!name || name.length > 250) {
+    throw new Error('その他の内容は1〜250文字で入力してください。');
+  }
+  const unitPriceYen = assertSafeYen(input.unit_price_yen);
+  return {
+    id: input.id,
+    line_kind: 'custom',
+    product: {
+      id: input.id,
+      organization_id: '',
+      product_code: 'OTHER',
+      name,
+      category_id: '',
+      tax_rate_id: input.taxRate.id,
+      price_yen: unitPriceYen,
+      active: true,
+      sort_order: 0,
+      deleted_at: null,
+      created_at: '',
+      updated_at: '',
+    },
+    quantity_milli: QUANTITY_SCALE,
+    unit_price_yen: unitPriceYen,
+    discount_yen: 0,
+    tax_rate_id: input.taxRate.id,
+    tax_rate_name: input.taxRate.name,
+    tax_rate_basis_points: input.taxRate.rate_basis_points,
+  };
+}
+
 export function addProductToCart(lines: CartLine[], product: Product, taxRate: TaxRate): CartLine[] {
-  const current = lines.find((line) => line.product.id === product.id);
+  const current = lines.find((line) => line.line_kind === 'catalog' && line.product.id === product.id);
   if (!current) return [...lines, createCartLine(product, taxRate)];
   return lines.map((line) => line.id === current.id
     ? { ...line, quantity_milli: Math.min(MAX_QUANTITY_MILLI, line.quantity_milli + QUANTITY_SCALE) }

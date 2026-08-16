@@ -9,7 +9,7 @@ const product: Product = {
 };
 
 const line: CartLine = {
-  id: product.id, product, quantity_milli: 1000, unit_price_yen: 1800, discount_yen: 0,
+  id: product.id, line_kind: 'catalog', product, quantity_milli: 1000, unit_price_yen: 1800, discount_yen: 0,
   tax_rate_id: 'tax', tax_rate_name: '標準税率', tax_rate_basis_points: 1000,
 };
 

@@ -4,9 +4,10 @@ type PosCategoryPanelProps = {
   roots: ProductCategory[];
   selectedId?: string;
   onSelect: (categoryId: string) => void;
+  onChooseOther: () => void;
 };
 
-export function PosCategoryPanel({ roots, selectedId, onSelect }: PosCategoryPanelProps) {
+export function PosCategoryPanel({ roots, selectedId, onSelect, onChooseOther }: PosCategoryPanelProps) {
   return (
     <section className="panel pos-category-panel" aria-labelledby="pos-category-title">
       <div className="panel-heading">
@@ -27,8 +28,8 @@ export function PosCategoryPanel({ roots, selectedId, onSelect }: PosCategoryPan
             {category.name}
           </button>
         ))}
+        <button className="pos-category-button other" type="button" onClick={onChooseOther}>＋ その他</button>
       </div>
     </section>
   );
 }
-

@@ -4,7 +4,7 @@ import { hasPermission } from '../auth/permissions';
 import { buildCategoryTree, categoryPath, descendantsOf } from './categoryTree';
 import { CategoryForm } from './CategoryForm';
 import { CategoryTree } from './ProductCategoryTree';
-import { listCategories, listProducts, listTaxRates } from './productApi';
+import { archiveCategoryTree, archiveProduct, listCategories, listProducts, listTaxRates } from './productApi';
 import { ProductForm } from './ProductForm';
 import { ProductList } from './ProductList';
 import type { Product, ProductCategory, TaxRate } from './types';
@@ -25,6 +25,7 @@ export function ProductPage({ profile }: { profile: Profile }) {
   const [taxRates, setTaxRates] = useState<TaxRate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [categoryEditor, setCategoryEditor] = useState<CategoryEditor>({ kind: 'create' });
   const [productEditor, setProductEditor] = useState<ProductEditor>({ kind: 'create' });
@@ -71,6 +72,23 @@ export function ProductPage({ profile }: { profile: Profile }) {
 
   function reload() { setReloadKey((value) => value + 1); }
 
+  async function handleCategoryArchived() {
+    if (!selectedCategory) return;
+    const result = await archiveCategoryTree(selectedCategory.id);
+    setCategoryEditor({ kind: 'create' });
+    setProductEditor({ kind: 'create' });
+    setNotice(`「${result.category_name}」以下のカテゴリ ${result.archived_category_count} 件、商品 ${result.archived_product_count} 件を削除しました。`);
+    reload();
+  }
+
+  async function handleProductArchived() {
+    if (!selectedProduct) return;
+    const result = await archiveProduct(selectedProduct.id);
+    setProductEditor({ kind: 'create' });
+    setNotice(`商品「${result.product_name}」を削除しました。`);
+    reload();
+  }
+
   return (
     <section className="page-view products-page" aria-labelledby="products-page-title">
       <header className="page-header">
@@ -85,6 +103,7 @@ export function ProductPage({ profile }: { profile: Profile }) {
         <button type="button" role="tab" aria-selected={tab === 'products'} className={tab === 'products' ? 'active' : ''} onClick={() => setTab('products')}>商品マスタ</button>
       </div>
       {error && <p className="form-error page-error" role="alert">{error}</p>}
+      {notice && <p className="document-notice" role="status">{notice}</p>}
 
       {tab === 'categories' ? (
         <div className="master-workspace">
@@ -104,8 +123,10 @@ export function ProductPage({ profile }: { profile: Profile }) {
                 initialParentId={categoryEditor.kind === 'create' ? categoryEditor.parentId : undefined}
                 onSaved={(saved) => {
                   setCategoryEditor({ kind: 'edit', category: saved });
+                  setNotice(null);
                   reload();
                 }}
+                onArchived={handleCategoryArchived}
               />
             )}
           </section>
@@ -133,8 +154,10 @@ export function ProductPage({ profile }: { profile: Profile }) {
                 product={selectedProduct}
                 onSaved={(saved) => {
                   setProductEditor({ kind: 'edit', product: saved });
+                  setNotice(null);
                   reload();
                 }}
+                onArchived={handleProductArchived}
               />
             )}
           </section>

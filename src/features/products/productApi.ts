@@ -165,3 +165,27 @@ export async function updateProduct(productId: string, input: ProductInput): Pro
   if (error) throw error;
   return data;
 }
+
+export async function archiveProduct(productId: string): Promise<{ product_id: string; product_name: string; status: 'archived' }> {
+  const { data, error } = await requireSupabase().rpc('archive_product', { p_product_id: productId });
+  if (error) throw error;
+  return data as { product_id: string; product_name: string; status: 'archived' };
+}
+
+export async function archiveCategoryTree(categoryId: string): Promise<{
+  category_id: string;
+  category_name: string;
+  archived_category_count: number;
+  archived_product_count: number;
+  status: 'archived';
+}> {
+  const { data, error } = await requireSupabase().rpc('archive_product_category_tree', { p_category_id: categoryId });
+  if (error) throw error;
+  return data as {
+    category_id: string;
+    category_name: string;
+    archived_category_count: number;
+    archived_product_count: number;
+    status: 'archived';
+  };
+}

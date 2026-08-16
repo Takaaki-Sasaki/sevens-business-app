@@ -56,12 +56,21 @@ export function createCheckoutPayload(input: {
     p_invoice_subject: input.invoiceSubject?.trim() || null,
     p_billing_month: input.billingMonth || null,
     p_due_date: input.dueDate || null,
-    p_lines: input.lines.map((line) => ({
-      product_id: line.product.id,
-      quantity_milli: line.quantity_milli,
-      unit_price_yen: line.unit_price_yen,
-      discount_yen: line.discount_yen,
-    })),
+    p_lines: input.lines.map((line) => line.line_kind === 'custom'
+      ? {
+        product_id: null,
+        custom_item_name: line.product.name,
+        tax_rate_id: line.tax_rate_id,
+        quantity_milli: line.quantity_milli,
+        unit_price_yen: line.unit_price_yen,
+        discount_yen: line.discount_yen,
+      }
+      : {
+        product_id: line.product.id,
+        quantity_milli: line.quantity_milli,
+        unit_price_yen: line.unit_price_yen,
+        discount_yen: line.discount_yen,
+      }),
   };
 }
 
