@@ -8,6 +8,6 @@ export default defineConfig({
     port: 5173,
   },
   test: {
-    exclude: [...configDefaults.exclude, 'upload/**'],
+    exclude: [...configDefaults.exclude, 'upload/**', 'backup/**'],
   },
 });

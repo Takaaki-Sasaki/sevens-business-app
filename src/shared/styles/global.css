@@ -734,11 +734,14 @@ h2 { font-size: 21px; }
 
 .invoice-workspace { display: grid; grid-template-columns: minmax(300px, .68fr) minmax(560px, 1.32fr); align-items: start; gap: 18px; }
 .invoice-list-panel { position: sticky; top: 24px; overflow: hidden; }
-.invoice-filters { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 8px; padding: 0 21px 15px; }
-.invoice-filters .search-field { padding: 0; }
-.invoice-filters > label:not(.search-field) { display: grid; gap: 5px; color: #aaa292; font-size: 10px; font-weight: 700; }
-.invoice-filters select { min-height: 42px; padding: 8px; border: 1px solid #575143; border-radius: 8px; outline: none; color: #f7f0e2; background: #181713; }
-.invoice-list { max-height: calc(100vh - 312px); overflow: auto; border-top: 1px solid #373229; }
+.invoice-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 9px; padding: 0 21px 15px; }
+.invoice-filters .field { display: grid; gap: 5px; color: #aaa292; font-size: 10px; font-weight: 700; }
+.invoice-filters .field input, .invoice-filters .field select { min-width: 0; min-height: 40px; padding: 8px; border: 1px solid #575143; border-radius: 8px; outline: none; color: #f7f0e2; background: #181713; }
+.invoice-filter-query { grid-column: span 2; }
+.invoice-filter-actions { display: flex; align-items: end; justify-content: flex-end; gap: 4px; }
+.invoice-filter-actions .primary-button { min-height: 40px; padding: 8px 14px; white-space: nowrap; }
+.invoice-filter-actions .text-button { min-height: 40px; padding: 8px 4px; color: #c4b9a3; font-size: 11px; white-space: nowrap; }
+.invoice-list { max-height: calc(100vh - 455px); overflow: auto; border-top: 1px solid #373229; }
 .invoice-row { display: flex; width: 100%; min-height: 65px; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 17px; border: 0; border-bottom: 1px solid #373229; color: #ede5d5; background: transparent; text-align: left; }
 .invoice-row:hover, .invoice-row.selected { background: rgba(216, 168, 63, .1); }
 .invoice-row.selected { box-shadow: inset 3px 0 #dcac43; }
@@ -962,7 +965,8 @@ h2 { font-size: 21px; }
     line-height: 1.2;
   }
   .mobile-navigation button.active { color: #efc461; font-weight: 800; opacity: 1; }
-  .mobile-navigation.with-admin { grid-template-columns: repeat(7, 1fr); }
+  .mobile-navigation { grid-template-columns: repeat(6, 1fr); }
+  .mobile-navigation.with-admin { grid-template-columns: repeat(8, 1fr); }
   .primary-button, .secondary-button, .danger-button { min-height: 44px; }
   .text-button { min-height: 40px; }
   .field input, .field select, .search-field input, .product-filters select { min-height: 44px; }

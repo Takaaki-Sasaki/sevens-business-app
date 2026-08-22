@@ -59,10 +59,18 @@ export type InvoiceItem = {
 };
 
 export type InvoiceFilters = {
+  /** 発行日（開始）。下書きには発行日がないため、この条件では表示されない。 */
+  issuedFrom: string;
+  /** 発行日（終了）。 */
+  issuedTo: string;
   query: string;
   customerId: string;
   status: '' | InvoiceStatus;
 };
+
+export function createEmptyInvoiceFilters(): InvoiceFilters {
+  return { issuedFrom: '', issuedTo: '', query: '', customerId: '', status: '' };
+}
 
 export type InvoiceDetail = {
   invoice: Invoice;

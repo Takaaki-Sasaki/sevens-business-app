@@ -14,6 +14,21 @@ function localDate(): string {
   return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
 }
 
+/**
+ * 日付入力（YYYY-MM-DD）の午前0時を、操作端末のタイムゾーン付きのISO文字列にする。
+ * 発行日時は timestamptz のため、日付の終端は翌日の午前0時未満で検索する。
+ */
+function localDayBoundary(dateText: string, daysToAdd = 0): string {
+  const [year, month, day] = dateText.split('-').map(Number);
+  const date = new Date(year, month - 1, day + daysToAdd);
+  const pad = (value: number) => String(value).padStart(2, '0');
+  const offsetMinutes = -date.getTimezoneOffset();
+  const sign = offsetMinutes >= 0 ? '+' : '-';
+  const absoluteOffset = Math.abs(offsetMinutes);
+  const offset = `${sign}${pad(Math.floor(absoluteOffset / 60))}:${pad(absoluteOffset % 60)}`;
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T00:00:00${offset}`;
+}
+
 export function createInvoicePayload(input: CreateInvoiceFromSaleInput) {
   return {
     p_sale_id: input.saleId,
@@ -81,7 +96,10 @@ export async function listInvoices(organizationId: string, filters: InvoiceFilte
     .select(invoiceFields)
     .eq('organization_id', organizationId)
     .is('deleted_at', null)
+    .order('issued_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false });
+  if (filters.issuedFrom) query = query.gte('issued_at', localDayBoundary(filters.issuedFrom));
+  if (filters.issuedTo) query = query.lt('issued_at', localDayBoundary(filters.issuedTo, 1));
   if (filters.customerId) query = query.eq('customer_id', filters.customerId);
   if (filters.status === 'overdue') {
     const today = localDate();

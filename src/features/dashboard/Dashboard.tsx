@@ -7,7 +7,8 @@ import { ProductPage } from '../products/ProductPage';
 import { PosPage } from '../pos/PosPage';
 import { SalesHistoryPage } from '../sales/SalesHistoryPage';
 import { getTodaySalesSummary } from '../sales/saleApi';
-import { InvoicePage } from '../invoices/InvoicePage';
+import { InvoicePage, type InvoiceFilterRequest } from '../invoices/InvoicePage';
+import { createEmptyInvoiceFilters } from '../invoices/types';
 import { DocumentsPage } from '../documents/DocumentsPage';
 import { UserManagementPage } from '../users/UserManagementPage';
 
@@ -45,10 +46,16 @@ const adminNavigation: NavigationItem[] = [
   { label: 'ユーザー管理', description: '利用者を管理', permission: 'users.manage', route: 'users' },
 ];
 
+function localSystemDate(): string {
+  const now = new Date();
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+}
+
 export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataVersion, onCustomersChanged }: DashboardProps) {
   const isAdmin = profile.role === 'admin';
   const [customerCount, setCustomerCount] = useState<string>('—');
   const [todaySales, setTodaySales] = useState<{ totalYen: number; count: number }>();
+  const [invoiceFilterRequest, setInvoiceFilterRequest] = useState<InvoiceFilterRequest>();
   const visibleNavigation: NavigationItem[] = [
     ...navigation.filter((item) => hasPermission(profile.role, item.permission)),
     ...(hasPermission(profile.role, 'users.manage') ? adminNavigation : []),
@@ -71,6 +78,20 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
     return () => { cancelled = true; };
   }, [profile.organization_id, route]);
 
+  function navigate(nextRoute: AppRoute) {
+    setInvoiceFilterRequest(undefined);
+    onNavigate(nextRoute);
+  }
+
+  function openTodayIssuedInvoices() {
+    const today = localSystemDate();
+    const filters = createEmptyInvoiceFilters();
+    filters.issuedFrom = today;
+    filters.issuedTo = today;
+    setInvoiceFilterRequest({ id: Date.now(), filters });
+    onNavigate('invoices');
+  }
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -83,7 +104,7 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
               type="button"
               disabled={!item.route}
               title={item.route ? item.description : '今後のPhaseで実装予定です'}
-              onClick={() => item.route && onNavigate(item.route)}
+              onClick={() => item.route && navigate(item.route)}
             >
               {item.label}
             </button>
@@ -93,7 +114,7 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
       </aside>
 
       <main className="main-content">
-        {route === 'customers' ? <CustomerPage profile={profile} onCustomersChanged={onCustomersChanged} /> : route === 'products' ? <ProductPage profile={profile} /> : route === 'pos' ? <PosPage profile={profile} /> : route === 'sales' ? <SalesHistoryPage profile={profile} /> : route === 'invoices' ? <InvoicePage profile={profile} /> : route === 'documents' ? <DocumentsPage profile={profile} /> : route === 'users' ? <UserManagementPage profile={profile} /> : (
+        {route === 'customers' ? <CustomerPage profile={profile} onCustomersChanged={onCustomersChanged} /> : route === 'products' ? <ProductPage profile={profile} /> : route === 'pos' ? <PosPage profile={profile} /> : route === 'sales' ? <SalesHistoryPage profile={profile} /> : route === 'invoices' ? <InvoicePage profile={profile} filterRequest={invoiceFilterRequest} /> : route === 'documents' ? <DocumentsPage profile={profile} /> : route === 'users' ? <UserManagementPage profile={profile} /> : (
           <>
         <header className="page-header">
           <div>
@@ -105,7 +126,7 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
 
         <section className="summary-grid" aria-label="本日の状況">
           <SummaryCard label="本日の売上" value={todaySales ? `¥${todaySales.totalYen.toLocaleString()}` : '—'} note="確定済みの売上合計" />
-          <SummaryCard label="本日の会計件数" value={todaySales ? `${todaySales.count}件` : '—'} note="請求一覧を開く" onClick={() => onNavigate('invoices')} />
+          <SummaryCard label="本日の会計件数" value={todaySales ? `${todaySales.count}件` : '—'} note="本日発行した請求を確認" onClick={openTodayIssuedInvoices} />
           <SummaryCard label="未請求" value="—" note="請求連携はPhase 8で実装" />
           <SummaryCard label="登録顧客数" value={customerCount === '—' ? '—' : `${customerCount}件`} note="有効な顧客の登録数" />
         </section>
@@ -126,10 +147,11 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
           { label: '顧客', route: 'customers' as AppRoute },
           { label: '売上', route: 'sales' as AppRoute },
           { label: '請求', route: 'invoices' as AppRoute },
+          ...(hasPermission(profile.role, 'documents.create') ? [{ label: '帳票', route: 'documents' as AppRoute }] : []),
           ...(hasPermission(profile.role, 'products.read') ? [{ label: '商品', route: 'products' as AppRoute }] : []),
           ...(hasPermission(profile.role, 'users.manage') ? [{ label: '管理', route: 'users' as AppRoute }] : []),
         ].map((item) => (
-          <button key={item.label} type="button" className={item.route === route ? 'active' : ''} disabled={!item.route} onClick={() => item.route && onNavigate(item.route)}>{item.label}</button>
+          <button key={item.label} type="button" className={item.route === route ? 'active' : ''} disabled={!item.route} onClick={() => item.route && navigate(item.route)}>{item.label}</button>
         ))}
       </nav>
     </div>
