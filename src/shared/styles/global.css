@@ -4,6 +4,7 @@
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
 }
 
 * { box-sizing: border-box; }
@@ -859,7 +860,11 @@ h2 { font-size: 21px; }
   .app-shell { display: block; }
   .sidebar { display: none; }
   .main-content { padding: 25px 18px; }
+  /* iOS Safariで入力時に画面が自動拡大され、固定メニューと重なって見えることを防ぐ。 */
+  input, select, textarea { font-size: 16px !important; }
   .network-status-banner { top: max(10px, env(safe-area-inset-top)); right: 12px; left: 12px; max-width: none; }
+  .page-header, .panel-heading, .subsection-heading { flex-wrap: wrap; }
+  .page-header > *, .panel-heading > *, .subsection-heading > * { min-width: 0; }
   .page-header { margin-bottom: 24px; }
   .page-header h1 { font-size: 23px; line-height: 1.45; }
   .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -901,6 +906,7 @@ h2 { font-size: 21px; }
   .invoice-actions { grid-template-columns: 1fr; }
   .invoice-actions .primary-button, .invoice-actions .danger-button { width: 100%; }
   .manual-invoice-header-fields { grid-template-columns: 1fr; }
+  .manual-invoice-lines { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
   .manual-invoice-form > .primary-button { width: 100%; }
   .document-controls { padding: 16px; }
   .document-control-grid { grid-template-columns: 1fr; }
@@ -973,6 +979,22 @@ h2 { font-size: 21px; }
   .pos-product-card { min-height: 120px; }
   .pos-child-category { min-height: 76px; }
   .document-preview .doc-preview-area { padding: 14px; }
+}
+
+/* iPhone SE〜Pro Max相当の幅では、横並びの入力欄を縦に並べて重なりを防ぐ。 */
+@media (max-width: 480px) {
+  .sale-filter-panel, .invoice-filters { grid-template-columns: minmax(0, 1fr); }
+  .sale-filter-query, .sale-filter-actions, .invoice-filter-query { grid-column: auto; }
+  .sale-filter-actions, .invoice-filter-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
+  .sale-filter-actions .primary-button, .sale-filter-actions .text-button, .invoice-filter-actions .primary-button, .invoice-filter-actions .text-button { width: 100%; }
+  .manual-invoice-customer { grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+  .manual-invoice-customer .text-button { justify-self: start; }
+  .cash-settlement { grid-template-columns: minmax(0, 1fr); }
+  .cash-result { text-align: left; }
+  .cart-line-inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cart-line-inputs label:first-child { grid-column: span 2; }
+  .cart-line-calculation { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .cart-line-calculation strong { grid-column: span 2; }
 }
 
 @media (max-width: 390px) {
