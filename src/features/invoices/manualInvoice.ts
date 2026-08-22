@@ -27,7 +27,7 @@ function roundDivision(numerator: bigint, denominator: bigint, mode: TaxRounding
 }
 
 export function createManualInvoiceLine(taxRateId = ''): ManualInvoiceLineInput {
-  return { id: crypto.randomUUID(), itemName: '', quantity: '1', unitPriceYen: '0', discountYen: '0', taxRateId };
+  return { id: crypto.randomUUID(), productId: '', itemName: '', quantity: '1', unitPriceYen: '0', discountYen: '0', taxRateId };
 }
 
 export function calculateManualInvoice(lines: ManualInvoiceLineInput[], taxRates: TaxRate[], roundingMode: TaxRoundingMode): ManualInvoiceTotals {
@@ -53,8 +53,7 @@ export function calculateManualInvoice(lines: ManualInvoiceLineInput[], taxRates
 
 export function validateManualInvoice(input: { customerId?: string; billingMonth: string; dueDate: string; lines: ManualInvoiceLineInput[] }, taxRates: TaxRate[]): string | null {
   if (!input.customerId) return '請求先の顧客を選択してください。';
-  if (!input.billingMonth) return '請求月を入力してください。';
-  if (input.dueDate && input.dueDate < `${input.billingMonth}-01`) return '支払期限は請求月以降の日付を指定してください。';
+  if (input.billingMonth && input.dueDate && input.dueDate < `${input.billingMonth}-01`) return '支払期限は請求月以降の日付を指定してください。';
   if (input.lines.length === 0) return '請求明細を1件以上入力してください。';
   for (const [index, line] of input.lines.entries()) {
     if (!line.itemName.trim()) return `明細${index + 1}の内容を入力してください。`;

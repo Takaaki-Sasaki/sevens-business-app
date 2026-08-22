@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { configDefaults, defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -7,5 +7,7 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 5173,
   },
+  test: {
+    exclude: [...configDefaults.exclude, 'upload/**'],
+  },
 });
-

@@ -45,6 +45,8 @@ export type InvoiceItem = {
   id: string;
   invoice_id: string;
   source_sale_item_id: string | null;
+  product_id: string | null;
+  tax_rate_id: string | null;
   item_name_snapshot: string;
   quantity: number;
   unit_price_yen: number;
@@ -69,6 +71,7 @@ export type InvoiceDetail = {
 
 export type ManualInvoiceLineInput = {
   id: string;
+  productId: string;
   itemName: string;
   quantity: string;
   unitPriceYen: string;
@@ -83,4 +86,8 @@ export type CreateManualInvoiceInput = {
   billingMonth: string;
   dueDate: string;
   lines: ManualInvoiceLineInput[];
+};
+
+export type UpdateManualInvoiceInput = CreateManualInvoiceInput & {
+  invoiceId: string;
 };

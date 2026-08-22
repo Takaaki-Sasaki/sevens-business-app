@@ -105,7 +105,7 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
 
         <section className="summary-grid" aria-label="本日の状況">
           <SummaryCard label="本日の売上" value={todaySales ? `¥${todaySales.totalYen.toLocaleString()}` : '—'} note="確定済みの売上合計" />
-          <SummaryCard label="本日の会計件数" value={todaySales ? `${todaySales.count}件` : '—'} note="確定済みの会計件数" />
+          <SummaryCard label="本日の会計件数" value={todaySales ? `${todaySales.count}件` : '—'} note="請求一覧を開く" onClick={() => onNavigate('invoices')} />
           <SummaryCard label="未請求" value="—" note="請求連携はPhase 8で実装" />
           <SummaryCard label="登録顧客数" value={customerCount === '—' ? '—' : `${customerCount}件`} note="有効な顧客の登録数" />
         </section>
@@ -136,7 +136,16 @@ export function Dashboard({ profile, onSignOut, route, onNavigate, customerDataV
   );
 }
 
-function SummaryCard({ label, value, note }: { label: string; value: string; note: string }) {
+function SummaryCard({ label, value, note, onClick }: { label: string; value: string; note: string; onClick?: () => void }) {
+  if (onClick) {
+    return (
+      <button type="button" className="summary-card summary-card-action" onClick={onClick} aria-label={`${label}。請求一覧を開く`}>
+        <p>{label}</p>
+        <strong>{value}</strong>
+        <small>{note}　→</small>
+      </button>
+    );
+  }
   return (
     <article className="summary-card">
       <p>{label}</p>

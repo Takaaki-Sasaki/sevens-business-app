@@ -8,7 +8,7 @@ import { ManualInvoiceForm } from './ManualInvoiceForm';
 import type { Invoice, InvoiceDetail, InvoiceFilters } from './types';
 import { toUserMessage } from '../../shared/lib/userError';
 
-type Editor = { kind: 'create' } | { kind: 'detail'; invoice?: Invoice };
+type Editor = { kind: 'create' } | { kind: 'edit'; invoice: Invoice } | { kind: 'detail'; invoice?: Invoice };
 const defaultFilters: InvoiceFilters = { query: '', customerId: '', status: '' };
 
 export function InvoicePage({ profile }: { profile: Profile }) {
@@ -22,7 +22,7 @@ export function InvoicePage({ profile }: { profile: Profile }) {
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const selectedInvoiceId = editor.kind === 'detail' ? editor.invoice?.id : undefined;
+  const selectedInvoiceId = editor.kind === 'create' ? undefined : editor.invoice?.id;
   const canWrite = hasPermission(profile.role, 'invoices.write');
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export function InvoicePage({ profile }: { profile: Profile }) {
       {error && <p className="form-error page-error" role="alert">{error}</p>}
       <div className="invoice-workspace">
         <InvoiceList invoices={invoices} filters={filters} selectedId={selectedInvoiceId} loading={loading} onFiltersChange={setFilters} onSelect={(invoice) => setEditor({ kind: 'detail', invoice })} onCreate={() => setEditor({ kind: 'create' })} canCreate={canWrite} />
-        {editor.kind === 'create' && canWrite ? <ManualInvoiceForm organizationId={profile.organization_id} onCreated={(invoiceId) => { setFilters(defaultFilters); setEditor({ kind: 'detail', invoice: { id: invoiceId } as Invoice }); setRefreshKey((value) => value + 1); }} /> : <InvoiceDetailPanel detail={detail} loading={detailLoading} profile={profile} pendingAction={pendingAction} onIssue={() => runAction('issue', () => issueInvoice(selectedInvoiceId!))} onMarkPaid={() => runAction('paid', () => markInvoicePaid(selectedInvoiceId!))} onCancel={(reason) => runAction('cancel', () => cancelInvoice(selectedInvoiceId!, reason))} />}
+        {(editor.kind === 'create' || editor.kind === 'edit') && canWrite ? <ManualInvoiceForm organizationId={profile.organization_id} invoiceDetail={editor.kind === 'edit' ? detail : undefined} onSaved={(invoiceId) => { setFilters(defaultFilters); setEditor({ kind: 'detail', invoice: { id: invoiceId } as Invoice }); setRefreshKey((value) => value + 1); }} /> : <InvoiceDetailPanel detail={detail} loading={detailLoading} profile={profile} pendingAction={pendingAction} onEdit={() => { if (editor.kind === 'detail' && editor.invoice) setEditor({ kind: 'edit', invoice: editor.invoice }); }} onIssue={() => runAction('issue', () => issueInvoice(selectedInvoiceId!))} onMarkPaid={() => runAction('paid', () => markInvoicePaid(selectedInvoiceId!))} onCancel={(reason) => runAction('cancel', () => cancelInvoice(selectedInvoiceId!, reason))} />}
       </div>
     </section>
   );

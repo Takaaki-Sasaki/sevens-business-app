@@ -196,6 +196,9 @@ h2 { font-size: 21px; }
 .summary-card p { margin-bottom: 17px; color: #b4ac9c; font-size: 14px; }
 .summary-card strong { display: block; margin-bottom: 16px; color: #f3ca6b; font-size: 31px; }
 .summary-card small { color: #80796d; font-size: 11px; }
+.summary-card-action { width: 100%; color: inherit; text-align: left; cursor: pointer; }
+.summary-card-action:hover { border-color: #c79335; background: rgba(216, 168, 63, .11); transform: translateY(-1px); }
+.summary-card-action:hover small { color: #e5bf67; }
 
 .phase-notice { max-width: 720px; margin-top: 25px; padding: 25px; }
 .phase-notice h2 { margin-bottom: 9px; }
@@ -774,7 +777,7 @@ h2 { font-size: 21px; }
 .invoice-totals dd { color: #eee5d4; font-weight: 700; }
 .invoice-totals .grand { margin-top: 4px; padding-top: 9px; border-top: 1px solid #5a4b2f; color: #eec468; font-size: 14px; }
 .invoice-totals .grand dd { color: #f1c863; font-size: 20px; }
-.invoice-actions { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 10px; margin-top: 22px; padding-top: 18px; border-top: 1px solid #403a2f; }
+.invoice-actions { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: end; gap: 10px; margin-top: 22px; padding-top: 18px; border-top: 1px solid #403a2f; }
 .invoice-actions .primary-button { min-height: 42px; white-space: nowrap; }
 .invoice-actions .field { display: grid; gap: 6px; color: #aaa292; font-size: 11px; }
 .invoice-actions .field input { min-height: 42px; }
@@ -788,7 +791,7 @@ h2 { font-size: 21px; }
 .manual-invoice-header-fields { display: grid; grid-template-columns: minmax(0, 1fr) 135px 165px; gap: 10px; }
 .manual-invoice-header-fields .field { display: grid; gap: 6px; color: #aaa292; font-size: 11px; }
 .manual-invoice-lines { overflow: auto; padding: 12px; border: 1px solid #403a2f; border-radius: 10px; background: #1b1a16; }
-.manual-invoice-line-label, .manual-invoice-line { display: grid; grid-template-columns: minmax(120px, 1.45fr) 58px 78px 78px 118px 95px 25px; gap: 7px; min-width: 615px; align-items: center; }
+.manual-invoice-line-label, .manual-invoice-line { display: grid; grid-template-columns: minmax(175px, 1.25fr) minmax(145px, 1.2fr) 58px 78px 78px 118px 95px 25px; gap: 7px; min-width: 860px; align-items: center; }
 .manual-invoice-line-label { margin-bottom: 6px; color: #958d7e; font-size: 10px; }
 .manual-invoice-line { padding: 7px 0; border-top: 1px solid #353128; }
 .manual-invoice-line input, .manual-invoice-line select { width: 100%; min-width: 0; min-height: 37px; padding: 7px; border: 1px solid #575143; border-radius: 7px; outline: none; color: #f6eddd; background: #151411; font-size: 11px; }

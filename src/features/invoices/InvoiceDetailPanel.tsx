@@ -8,6 +8,7 @@ type InvoiceDetailPanelProps = {
   loading: boolean;
   profile: Profile;
   pendingAction?: 'issue' | 'paid' | 'cancel';
+  onEdit: () => void;
   onIssue: () => Promise<void>;
   onMarkPaid: () => Promise<void>;
   onCancel: (reason: string) => Promise<void>;
@@ -27,7 +28,7 @@ function formatQuantity(value: number): string {
   return Number.isInteger(value) ? value.toLocaleString() : value.toLocaleString(undefined, { maximumFractionDigits: 3 });
 }
 
-export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, onIssue, onMarkPaid, onCancel }: InvoiceDetailPanelProps) {
+export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, onEdit, onIssue, onMarkPaid, onCancel }: InvoiceDetailPanelProps) {
   const [reason, setReason] = useState('');
   const canWrite = hasPermission(profile.role, 'invoices.write');
 
@@ -42,6 +43,7 @@ export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, on
 
   const { invoice, items } = detail;
   const status = displayedStatus(detail);
+  const canEdit = canWrite && invoice.status === 'draft' && !invoice.source_sale_id;
   return (
     <section className="panel invoice-detail-panel" aria-labelledby="invoice-detail-title">
       <header className="panel-heading invoice-detail-heading">
@@ -60,7 +62,7 @@ export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, on
         <div className="invoice-item-table-wrap"><table className="invoice-item-table"><thead><tr><th>明細</th><th>数量</th><th>単価</th><th>割引</th><th>税</th><th>金額</th></tr></thead><tbody>{items.map((item) => <tr key={item.id}><td><strong>{item.item_name_snapshot}</strong></td><td>{formatQuantity(item.quantity)}</td><td>¥{item.unit_price_yen.toLocaleString()}</td><td>{item.discount_yen ? `−¥${item.discount_yen.toLocaleString()}` : '—'}</td><td>¥{item.tax_amount_yen.toLocaleString()}</td><td><strong>¥{item.line_total_yen.toLocaleString()}</strong></td></tr>)}</tbody></table></div>
         <dl className="invoice-totals"><div><dt>小計</dt><dd>¥{invoice.subtotal_yen.toLocaleString()}</dd></div><div><dt>消費税</dt><dd>¥{invoice.tax_amount_yen.toLocaleString()}</dd></div><div className="grand"><dt>請求金額</dt><dd>¥{invoice.total_amount_yen.toLocaleString()}</dd></div></dl>
         {invoice.status === 'cancelled' && <p className="invoice-cancelled-note">取消日時：{invoice.cancelled_at ? new Date(invoice.cancelled_at).toLocaleString('ja-JP') : '—'}{invoice.cancellation_reason ? ` ／ 理由：${invoice.cancellation_reason}` : ''}</p>}
-        {canWrite && invoice.status !== 'cancelled' && invoice.status !== 'paid' && <div className="invoice-actions">{invoice.status === 'draft' && <button type="button" className="primary-button" disabled={!!pendingAction} onClick={() => void onIssue()}>{pendingAction === 'issue' ? '発行中…' : '請求を発行済みにする'}</button>}{invoice.status === 'issued' && <button type="button" className="primary-button" disabled={!!pendingAction} onClick={() => void onMarkPaid()}>{pendingAction === 'paid' ? '登録中…' : '入金済みにする'}</button>}<label className="field"><span>取消理由（任意）</span><input value={reason} maxLength={500} placeholder="例：内容誤りのため" onChange={(event) => setReason(event.target.value)} /></label><button type="button" className="danger-button" disabled={!!pendingAction} onClick={() => void cancel()}>{pendingAction === 'cancel' ? '取消中…' : '請求を取消'}</button></div>}
+        {canWrite && invoice.status !== 'cancelled' && invoice.status !== 'paid' && <div className="invoice-actions">{canEdit && <button type="button" className="secondary-button" disabled={!!pendingAction} onClick={onEdit}>請求を編集</button>}{invoice.status === 'draft' && <button type="button" className="primary-button" disabled={!!pendingAction} onClick={() => void onIssue()}>{pendingAction === 'issue' ? '発行中…' : '請求を発行済みにする'}</button>}{invoice.status === 'issued' && <button type="button" className="primary-button" disabled={!!pendingAction} onClick={() => void onMarkPaid()}>{pendingAction === 'paid' ? '登録中…' : '入金済みにする'}</button>}<label className="field"><span>取消理由（任意）</span><input value={reason} maxLength={500} placeholder="例：内容誤りのため" onChange={(event) => setReason(event.target.value)} /></label><button type="button" className="danger-button" disabled={!!pendingAction} onClick={() => void cancel()}>{pendingAction === 'cancel' ? '取消中…' : '請求を取消'}</button></div>}
       </div>
     </section>
   );
