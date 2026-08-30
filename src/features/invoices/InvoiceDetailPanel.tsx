@@ -52,7 +52,8 @@ export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, on
       </header>
       <div className="invoice-detail-body">
         <dl className="invoice-meta-grid">
-          <div><dt>顧客</dt><dd>{invoice.customer_name_snapshot}</dd></div>
+          <div><dt>顧客</dt><dd>{invoice.customer_name_snapshot || '顧客未設定'}</dd></div>
+          <div><dt>支払方法</dt><dd>{invoice.payment_method_name_snapshot || '未設定'}</dd></div>
           <div><dt>件名</dt><dd>{invoice.subject || '件名未設定'}</dd></div>
           <div><dt>請求月</dt><dd>{invoice.billing_month ? invoice.billing_month.replaceAll('-', '/') : '—'}</dd></div>
           <div><dt>支払期限</dt><dd>{invoice.due_date ? invoice.due_date.replaceAll('-', '/') : '未設定'}</dd></div>

@@ -60,7 +60,7 @@ export type SaleCheckoutResult = {
   total_amount_yen: number;
   change_amount_yen: number;
   status: 'confirmed';
-  invoice?: InvoiceLink | null;
+  invoice: InvoiceLink;
 };
 
 export type SaleFilters = {

@@ -46,6 +46,7 @@ describe('売上確定リクエスト', () => {
     expect(payload.p_customer_id).toBeNull();
     expect(payload.p_vehicle_id).toBeNull();
     expect(payload.p_amount_received_yen).toBeNull();
+    expect(payload.p_create_invoice).toBe(true);
   });
 
   it('通信を再試行しても同じ会計キーを維持する', () => {

@@ -34,7 +34,6 @@ export function PosPage({ profile }: { profile: Profile }) {
   const [cartLines, setCartLines] = useState<CartLine[]>([]);
   const [paymentMethodId, setPaymentMethodId] = useState('');
   const [amountReceivedInput, setAmountReceivedInput] = useState('');
-  const [createInvoice, setCreateInvoice] = useState(false);
   const [isCustomerFormOpen, setCustomerFormOpen] = useState(false);
   const [isOtherItemFormOpen, setOtherItemFormOpen] = useState(false);
   const [checkoutKey, setCheckoutKey] = useState(() => crypto.randomUUID());
@@ -80,12 +79,10 @@ export function PosPage({ profile }: { profile: Profile }) {
   const selectedQuantity = formatQuantity(cartLines.reduce((total, line) => total + line.quantity_milli, 0));
   const allowPriceOverride = hasPermission(profile.role, 'pos.price_override');
   const selectedPaymentMethod = paymentMethods.find((method) => method.id === paymentMethodId);
-  const invoiceWillBeCreated = selectedPaymentMethod?.code === 'accounts_receivable' || createInvoice;
   const amountReceivedYen = parseYen(amountReceivedInput);
   const cashSettlement = calculateCashSettlement(cartTotals.total_amount_yen, amountReceivedYen || 0);
   const checkoutDisabled = cartLines.length === 0
     || !selectedPaymentMethod
-    || (invoiceWillBeCreated && !selectedCustomer)
     || (selectedPaymentMethod.code === 'cash' && (amountReceivedYen === null || cashSettlement.shortfall_yen > 0));
 
   function invalidateCheckout() {
@@ -135,13 +132,11 @@ export function PosPage({ profile }: { profile: Profile }) {
         vehicleId: selectedVehicleId,
         paymentMethodId: selectedPaymentMethod.id,
         amountReceivedYen: selectedPaymentMethod.code === 'cash' ? amountReceivedYen || undefined : undefined,
-        createInvoice: invoiceWillBeCreated,
         lines: cartLines,
       });
       setCompletedSale(result);
       setCartLines([]);
       setAmountReceivedInput('');
-      setCreateInvoice(false);
       setMobileCartOpen(false);
       invalidateCheckout();
     } catch (caught) {
@@ -246,14 +241,6 @@ export function PosPage({ profile }: { profile: Profile }) {
               invalidateCheckout();
             }}
             totals={cartTotals}
-            createInvoice={createInvoice}
-            canCreateInvoice={hasPermission(profile.role, 'invoices.write')}
-            hasCustomer={!!selectedCustomer}
-            onCreateInvoiceChange={(value) => {
-              if (isCheckingOut) return;
-              setCreateInvoice(value);
-              invalidateCheckout();
-            }}
             onCheckout={() => void handleCheckout()}
             checkoutPending={isCheckingOut}
             checkoutDisabled={checkoutDisabled}
@@ -314,7 +301,7 @@ export function PosPage({ profile }: { profile: Profile }) {
               <h2 id="sale-complete-title">会計を確定しました</h2>
               <strong>¥{completedSale.total_amount_yen.toLocaleString()}</strong>
               <p>売上番号：{completedSale.sale_number}</p>
-              {completedSale.invoice && <p>請求番号：{completedSale.invoice.invoice_number}</p>}
+              <p>請求番号：{completedSale.invoice.invoice_number}</p>
               {completedSale.change_amount_yen > 0 && <p>お釣り：¥{completedSale.change_amount_yen.toLocaleString()}</p>}
               <button type="button" className="primary-button" onClick={() => setCompletedSale(undefined)}>次の会計へ</button>
             </div>

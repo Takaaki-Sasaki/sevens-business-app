@@ -52,7 +52,6 @@ export function calculateManualInvoice(lines: ManualInvoiceLineInput[], taxRates
 }
 
 export function validateManualInvoice(input: { customerId?: string; billingMonth: string; dueDate: string; lines: ManualInvoiceLineInput[] }, taxRates: TaxRate[]): string | null {
-  if (!input.customerId) return '請求先の顧客を選択してください。';
   if (input.billingMonth && input.dueDate && input.dueDate < `${input.billingMonth}-01`) return '支払期限は請求月以降の日付を指定してください。';
   if (input.lines.length === 0) return '請求明細を1件以上入力してください。';
   for (const [index, line] of input.lines.entries()) {

@@ -24,4 +24,10 @@ describe('A4帳票マークアップ', () => {
     expect(markup).toContain('株式会社 &lt;テスト&gt;');
     expect(markup).not.toContain('株式会社 <テスト>');
   });
+
+  it('顧客未設定の請求では宛名と敬称を空欄にする', () => {
+    const markup = documentMarkup({ ...data, customerName: '' });
+    expect(markup).toContain('<section class="doc-recipient"><span></span><span></span></section>');
+    expect(markup).not.toContain('顧客未設定');
+  });
 });

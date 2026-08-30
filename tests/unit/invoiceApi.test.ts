@@ -24,10 +24,9 @@ describe('売上から請求への変換リクエスト', () => {
     });
   });
 
-  it('会計時に請求作成を指定でき、未指定時は作成しない', () => {
+  it('支払方法にかかわらず会計時の請求自動作成を指定する', () => {
     const base = { idempotencyKey: '34d4bd6c-747f-43ef-a1c5-12e146326aff', paymentMethodId: '4f9d5ac3-976c-4b10-a97c-0d0f60e351f8', lines: [line] };
-    expect(createCheckoutPayload(base).p_create_invoice).toBe(false);
-    expect(createCheckoutPayload({ ...base, createInvoice: true }).p_create_invoice).toBe(true);
+    expect(createCheckoutPayload(base).p_create_invoice).toBe(true);
   });
 
   it('手動請求は請求月未入力をNULLとして送り、商品選択は任意で保存する', () => {
@@ -50,5 +49,18 @@ describe('売上から請求への変換リクエスト', () => {
       p_billing_month: null,
       p_lines: [{ product_id: product.id, item_name: '任意の摘要' }],
     });
+  });
+
+  it('手動請求は顧客未選択をNULLとして送信する', () => {
+    const input = {
+      idempotencyKey: 'af13e7b8-aee7-48ac-b4da-3dca36ad29ec',
+      customerId: undefined,
+      subject: '一般請求',
+      billingMonth: '',
+      dueDate: '',
+      lines: [{ id: 'line-1', productId: '', itemName: '臨時作業', quantity: '1', unitPriceYen: '1000', discountYen: '0', taxRateId: 'tax' }],
+    };
+    expect(createManualInvoicePayload(input).p_customer_id).toBeNull();
+    expect(updateManualInvoicePayload({ ...input, invoiceId: 'f8ad958d-7c61-43ea-aaf3-b0881ef7fc9e' }).p_customer_id).toBeNull();
   });
 });

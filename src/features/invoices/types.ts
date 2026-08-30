@@ -20,8 +20,10 @@ export type Invoice = {
   organization_id: string;
   invoice_number: string;
   source_sale_id: string | null;
-  customer_id: string;
-  customer_name_snapshot: string;
+  customer_id: string | null;
+  customer_name_snapshot: string | null;
+  payment_method_id: string | null;
+  payment_method_name_snapshot: string | null;
   subject: string | null;
   billing_month: string | null;
   due_date: string | null;
@@ -89,7 +91,7 @@ export type ManualInvoiceLineInput = {
 
 export type CreateManualInvoiceInput = {
   idempotencyKey: string;
-  customerId: string;
+  customerId?: string;
   subject: string;
   billingMonth: string;
   dueDate: string;

@@ -48,9 +48,9 @@ export async function listDocumentSources(organizationId: string, kind: Document
       .is('deleted_at', null)
       .neq('status', 'cancelled')
       .order('created_at', { ascending: false })
-      .returns<Array<{ id: string; invoice_number: string; customer_name_snapshot: string; subject: string | null; total_amount_yen: number; billing_month: string | null; created_at: string }>>();
+      .returns<Array<{ id: string; invoice_number: string; customer_name_snapshot: string | null; subject: string | null; total_amount_yen: number; billing_month: string | null; created_at: string }>>();
     if (error) throw error;
-    return data.map((row) => ({ id: row.id, number: row.invoice_number, customerName: row.customer_name_snapshot, subject: row.subject || '', totalAmountYen: row.total_amount_yen, date: row.billing_month || row.created_at.slice(0, 10) }));
+    return data.map((row) => ({ id: row.id, number: row.invoice_number, customerName: row.customer_name_snapshot || '顧客未設定', subject: row.subject || '', totalAmountYen: row.total_amount_yen, date: row.billing_month || row.created_at.slice(0, 10) }));
   }
 
   const { data, error } = await requireSupabase()
@@ -73,7 +73,7 @@ export async function createDocumentData(input: { organizationId: string; kind: 
     return {
       sourceKind: 'invoice', sourceId: detail.invoice.id, sourceNumber: detail.invoice.invoice_number,
       documentType: input.documentType, documentTitle: meta.title,
-      customerName: detail.invoice.customer_name_snapshot,
+      customerName: detail.invoice.customer_name_snapshot || '',
       subject: detail.invoice.subject || '', issueDate: localDate(), paymentDueDate: detail.invoice.due_date,
       bankInformation: input.issuer.bank_information,
       issuer: input.issuer,

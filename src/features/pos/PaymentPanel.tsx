@@ -8,16 +8,12 @@ type PaymentPanelProps = {
   amountReceivedInput: string;
   onAmountReceivedChange: (value: string) => void;
   totals: CartTotals;
-  createInvoice: boolean;
-  canCreateInvoice: boolean;
-  hasCustomer: boolean;
-  onCreateInvoiceChange: (value: boolean) => void;
   onCheckout: () => void;
   checkoutPending: boolean;
   checkoutDisabled: boolean;
 };
 
-export function PaymentPanel({ methods, selectedMethodId, onMethodChange, amountReceivedInput, onAmountReceivedChange, totals, createInvoice, canCreateInvoice, hasCustomer, onCreateInvoiceChange, onCheckout, checkoutPending, checkoutDisabled }: PaymentPanelProps) {
+export function PaymentPanel({ methods, selectedMethodId, onMethodChange, amountReceivedInput, onAmountReceivedChange, totals, onCheckout, checkoutPending, checkoutDisabled }: PaymentPanelProps) {
   const selectedMethod = methods.find((method) => method.id === selectedMethodId);
   const isCash = selectedMethod?.code === 'cash';
   const amountReceivedYen = parseYen(amountReceivedInput) || 0;
@@ -53,21 +49,14 @@ export function PaymentPanel({ methods, selectedMethodId, onMethodChange, amount
           </div>
         </div>
       )}
-      {selectedMethod?.code === 'accounts_receivable' && <p className="payment-note">掛売は、会計確定と同時に請求データを自動作成します。顧客を選択してください。</p>}
-      {selectedMethod?.code !== 'accounts_receivable' && canCreateInvoice && (
-        <label className="invoice-create-choice">
-          <input type="checkbox" checked={createInvoice} disabled={!hasCustomer} onChange={(event) => onCreateInvoiceChange(event.target.checked)} />
-          <span>この会計から請求データも作成する</span>
-          {!hasCustomer && <small>請求データの作成には顧客選択が必要です。</small>}
-        </label>
-      )}
+      {selectedMethod && <p className="payment-note">会計確定と同時に請求データを自動作成します。顧客の選択は任意です。</p>}
       <div className="checkout-preview">
         <span>今回の会計金額</span>
         <strong>¥{totals.total_amount_yen.toLocaleString()}</strong>
         <button type="button" className="checkout-button" onClick={onCheckout} disabled={checkoutDisabled || checkoutPending}>
           {checkoutPending ? '会計を確定中…' : '会計を確定'}
         </button>
-        {checkoutDisabled && !checkoutPending && <small>商品・支払方法{isCash ? '・不足のない預かり金' : ''}{(createInvoice || selectedMethod?.code === 'accounts_receivable') ? '・必要な顧客選択' : ''}を確認してください。</small>}
+        {checkoutDisabled && !checkoutPending && <small>商品・支払方法{isCash ? '・不足のない預かり金' : ''}を確認してください。</small>}
       </div>
     </section>
   );

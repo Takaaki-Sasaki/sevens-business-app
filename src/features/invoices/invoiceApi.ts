@@ -2,7 +2,7 @@ import { requireSupabase } from '../../shared/lib/supabase';
 import { parseQuantity, parseYen } from '../pos/cart';
 import type { CreateInvoiceFromSaleInput, CreateManualInvoiceInput, Invoice, InvoiceDetail, InvoiceFilters, InvoiceItem, InvoiceLink, ManualInvoiceLineInput, UpdateManualInvoiceInput } from './types';
 
-const invoiceFields = 'id, organization_id, invoice_number, source_sale_id, customer_id, customer_name_snapshot, subject, billing_month, due_date, subtotal_yen, tax_amount_yen, total_amount_yen, status, issued_at, issued_by, paid_at, cancelled_at, cancelled_by, cancellation_reason, deleted_at, created_by, created_at, updated_at';
+const invoiceFields = 'id, organization_id, invoice_number, source_sale_id, customer_id, customer_name_snapshot, payment_method_id, payment_method_name_snapshot, subject, billing_month, due_date, subtotal_yen, tax_amount_yen, total_amount_yen, status, issued_at, issued_by, paid_at, cancelled_at, cancelled_by, cancellation_reason, deleted_at, created_by, created_at, updated_at';
 const invoiceItemFields = 'id, invoice_id, source_sale_item_id, product_id, tax_rate_id, item_name_snapshot, quantity, unit_price_yen, discount_yen, tax_rate_basis_points, line_subtotal_yen, tax_amount_yen, line_total_yen, sort_order';
 
 function safeSearchTerm(value: string): string {
@@ -58,7 +58,7 @@ function manualInvoiceLinesPayload(lines: ManualInvoiceLineInput[]) {
 export function createManualInvoicePayload(input: CreateManualInvoiceInput) {
   return {
     p_idempotency_key: input.idempotencyKey,
-    p_customer_id: input.customerId,
+    p_customer_id: input.customerId || null,
     p_subject: input.subject.trim() || null,
     p_billing_month: input.billingMonth ? `${input.billingMonth}-01` : null,
     p_due_date: input.dueDate || null,
@@ -76,7 +76,7 @@ export function updateManualInvoicePayload(input: UpdateManualInvoiceInput) {
   return {
     p_idempotency_key: input.idempotencyKey,
     p_invoice_id: input.invoiceId,
-    p_customer_id: input.customerId,
+    p_customer_id: input.customerId || null,
     p_subject: input.subject.trim() || null,
     p_billing_month: input.billingMonth ? `${input.billingMonth}-01` : null,
     p_due_date: input.dueDate || null,

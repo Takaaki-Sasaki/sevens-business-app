@@ -39,7 +39,6 @@ export function createCheckoutPayload(input: {
   vehicleId?: string;
   paymentMethodId: string;
   amountReceivedYen?: number;
-  createInvoice?: boolean;
   invoiceSubject?: string;
   billingMonth?: string;
   dueDate?: string;
@@ -52,7 +51,8 @@ export function createCheckoutPayload(input: {
     p_sale_date: localSaleDate(),
     p_payment_method_id: input.paymentMethodId,
     p_amount_received_yen: input.amountReceivedYen ?? null,
-    p_create_invoice: input.createInvoice ?? false,
+    // RPCの後方互換用引数。現在はすべての会計で請求を自動作成する。
+    p_create_invoice: true,
     p_invoice_subject: input.invoiceSubject?.trim() || null,
     p_billing_month: input.billingMonth || null,
     p_due_date: input.dueDate || null,

@@ -84,8 +84,8 @@ export function ManualInvoiceForm({ organizationId, invoiceDetail, onSaved }: Ma
       return;
     }
     setCustomerSearch('');
-    setCustomerId(editingInvoice.customer_id);
-    setCustomerDisplay(editingInvoice.customer_name_snapshot);
+    setCustomerId(editingInvoice.customer_id || undefined);
+    setCustomerDisplay(editingInvoice.customer_name_snapshot || '');
     setSubject(editingInvoice.subject || '');
     setBillingMonth(editingInvoice.billing_month ? editingInvoice.billing_month.slice(0, 7) : '');
     setDueDate(editingInvoice.due_date || '');
@@ -138,7 +138,7 @@ export function ManualInvoiceForm({ organizationId, invoiceDetail, onSaved }: Ma
     setSaving(true);
     setError(null);
     try {
-      const input = { idempotencyKey, customerId: customerId!, subject, billingMonth, dueDate, lines };
+      const input = { idempotencyKey, customerId, subject, billingMonth, dueDate, lines };
       const result = isEditing
         ? await updateManualInvoice({ ...input, invoiceId: editingInvoice.id })
         : await createManualInvoice(input);
@@ -158,7 +158,7 @@ export function ManualInvoiceForm({ organizationId, invoiceDetail, onSaved }: Ma
       <div className="manual-invoice-form">
         {error && <p className="form-error" role="alert">{error}</p>}
         <div className="manual-invoice-customer">
-          <label className="field"><span>請求先顧客</span><input value={customerId ? customerDisplay : customerSearch} placeholder="顧客番号・氏名・電話番号で検索" onChange={(event) => { setCustomerId(undefined); setCustomerDisplay(''); setCustomerSearch(event.target.value); invalidateRequest(); }} /></label>
+          <label className="field"><span>請求先顧客（任意）</span><input value={customerId ? customerDisplay : customerSearch} placeholder="必要な場合のみ顧客を検索" onChange={(event) => { setCustomerId(undefined); setCustomerDisplay(''); setCustomerSearch(event.target.value); invalidateRequest(); }} /></label>
           {customerId && <button type="button" className="text-button" onClick={() => { setCustomerId(undefined); setCustomerDisplay(''); setCustomerSearch(''); invalidateRequest(); }}>選択解除</button>}
           {!customerId && customerSearch && <div className="customer-search-results">{customerResults.map((item) => <button key={item.id} type="button" onClick={() => { setCustomerId(item.id); setCustomerDisplay(`${item.customer_code} / ${item.name}`); setCustomerSearch(''); invalidateRequest(); }}><strong>{item.name}</strong><small>{item.customer_code} ／ {item.phone || item.mobile_phone || '電話番号未登録'}</small></button>)}</div>}
         </div>

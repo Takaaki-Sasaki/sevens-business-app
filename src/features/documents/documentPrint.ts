@@ -43,6 +43,7 @@ export function documentMarkup(data: DocumentData): string {
   const rows = Array.from({ length: 8 }, (_, index) => data.lines[index]);
   const logo = escapeHtml(logoUrl());
   const recipient = escapeHtml(data.customerName || '');
+  const recipientSuffix = recipient ? '御中' : '';
   const issuer = escapeHtml(data.issuer.issuer_name || 'SEVENS');
   const postal = escapeHtml(data.issuer.postal_code ? `〒${data.issuer.postal_code}` : '');
   const address = issuerAddress(data);
@@ -53,7 +54,7 @@ export function documentMarkup(data: DocumentData): string {
   const itemRows = rows.map((line) => `<tr><td>${line ? escapeHtml(line.name) : ''}</td><td>${line ? formatQuantity(line.quantity) : ''}</td><td>${line ? escapeHtml(formatYen(line.unitPriceYen)) : ''}</td><td>${line ? escapeHtml(formatYen(line.amountYen)) : ''}</td></tr>`).join('');
   return `<article class="doc-paper">
     <h1 class="doc-title">${escapeHtml(data.documentTitle)}</h1>
-    <section class="doc-recipient"><span>${recipient}</span><span>御中</span></section>
+    <section class="doc-recipient"><span>${recipient}</span><span>${recipientSuffix}</span></section>
     <section class="doc-issuer"><strong>${issuer}</strong><span>${postal}</span><span>${address}</span><span>${data.issuer.phone ? `TEL：${escapeHtml(data.issuer.phone)}` : ''}</span><span>${data.issuer.fax ? `FAX：${escapeHtml(data.issuer.fax)}` : ''}</span></section>
     <p class="doc-message">${messageFor(data.documentType)}</p>
     <dl class="doc-meta"><div><dt>件名：</dt><dd>${subject}</dd></div><div><dt>${data.documentType === 'receipt' ? '領収日：' : '支払期限：'}</dt><dd>${data.documentType === 'receipt' ? escapeHtml(formatDate(data.issueDate)) : due}</dd></div>${showBank ? `<div><dt>振込先：</dt><dd>${bank}</dd></div>` : ''}</dl>

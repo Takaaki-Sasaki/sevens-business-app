@@ -47,7 +47,7 @@ export function InvoiceList({ invoices, filters, selectedId, loading, onFiltersC
           const status = visibleStatus(invoice);
           return (
             <button key={invoice.id} type="button" className={invoice.id === selectedId ? 'invoice-row selected' : 'invoice-row'} onClick={() => onSelect(invoice)}>
-              <span className="invoice-row-main"><strong>{invoice.invoice_number}</strong><small>{displayIssuedDate(invoice.issued_at)} ／ {invoice.customer_name_snapshot} ／ {invoice.subject || '件名未設定'}</small></span>
+              <span className="invoice-row-main"><strong>{invoice.invoice_number}</strong><small>{displayIssuedDate(invoice.issued_at)} ／ {invoice.customer_name_snapshot || '顧客未設定'} ／ {invoice.subject || '件名未設定'}</small></span>
               <span className="invoice-row-side"><em className={status}>{statusLabel(status)}</em><strong>¥{invoice.total_amount_yen.toLocaleString()}</strong></span>
             </button>
           );

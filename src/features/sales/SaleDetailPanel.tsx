@@ -30,7 +30,7 @@ export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling
   const [billingMonth, setBillingMonth] = useState('');
   const [dueDate, setDueDate] = useState('');
   const canCancel = !!detail && detail.sale.status === 'confirmed' && hasPermission(profile.role, 'sales.cancel');
-  const canCreateInvoice = !!detail && detail.sale.status === 'confirmed' && !!detail.sale.customer_id && !detail.invoice && hasPermission(profile.role, 'invoices.write');
+  const canCreateInvoice = !!detail && detail.sale.status === 'confirmed' && !detail.invoice && hasPermission(profile.role, 'invoices.write');
 
   useEffect(() => {
     if (!detail) return;
@@ -118,9 +118,6 @@ export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling
         )}
         {detail.invoice && (
           <p className="sale-invoice-linked">請求データ作成済み：<strong>{detail.invoice.invoice_number}</strong>（{detail.invoice.status === 'draft' ? '下書き' : detail.invoice.status}）</p>
-        )}
-        {sale.status === 'confirmed' && !sale.customer_id && hasPermission(profile.role, 'invoices.write') && (
-          <p className="sale-invoice-note">顧客未指定の売上は請求データを作成できません。</p>
         )}
         {canCreateInvoice && (
           <div className="sale-invoice-action">

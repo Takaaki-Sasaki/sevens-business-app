@@ -11,9 +11,9 @@ describe('手動請求の金額計算', () => {
     expect(totals).toMatchObject({ subtotalYen: 3000, discountYen: 200, taxAmountYen: 280, totalAmountYen: 3080 });
   });
 
-  it('請求先・税率・期限を検証し、請求月が未入力でも登録を許可する', () => {
+  it('税率・期限を検証し、顧客と請求月が未入力でも登録を許可する', () => {
     const line = { ...createManualInvoiceLine(taxRate.id), itemName: '整備作業', quantity: '1', unitPriceYen: '1000', discountYen: '0' };
-    expect(validateManualInvoice({ customerId: '', billingMonth: '2026-08', dueDate: '', lines: [line] }, [taxRate])).toContain('顧客');
+    expect(validateManualInvoice({ customerId: '', billingMonth: '', dueDate: '', lines: [line] }, [taxRate])).toBeNull();
     expect(validateManualInvoice({ customerId: 'customer', billingMonth: '2026-08', dueDate: '2026-07-31', lines: [line] }, [taxRate])).toContain('支払期限');
     expect(validateManualInvoice({ customerId: 'customer', billingMonth: '', dueDate: '', lines: [line] }, [taxRate])).toBeNull();
     expect(validateManualInvoice({ customerId: 'customer', billingMonth: '2026-08', dueDate: '2026-08-31', lines: [line] }, [taxRate])).toBeNull();

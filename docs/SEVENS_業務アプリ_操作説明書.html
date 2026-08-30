@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SEVENS 業務アプリ 操作説明書</title>
+  <style>
+    :root {
+      --ink: #1b1d20;
+      --sub: #5e6268;
+      --line: #d9d5cb;
+      --paper: #fbfaf6;
+      --paper-dark: #f1eee7;
+      --black: #161719;
+      --black-2: #25272a;
+      --gold: #c69332;
+      --gold-light: #f2dfb1;
+      --orange: #d87226;
+      --red: #b9423a;
+      --green: #3c7d62;
+      --blue: #3d6d8a;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; width: 595.28px; background: var(--paper); }
+    body { color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; font-size: 10px; line-height: 1.56; }
+    .page { position: relative; width: 595.28px; height: 841.89px; overflow: hidden; padding: 37px 42px 35px; background: var(--paper); }
+    .page::after { content: ""; position: absolute; left: 42px; right: 42px; bottom: 22px; height: 1px; background: var(--line); }
+    .page-number { position: absolute; right: 42px; bottom: 8px; color: #797c80; font-size: 8px; letter-spacing: .08em; }
+    .footer-logo { position: absolute; left: 42px; bottom: 7px; width: 52px; height: 13px; object-fit: contain; object-position: left center; }
+    h1, h2, h3, h4, p { margin: 0; }
+    h1 { font-size: 27px; line-height: 1.22; letter-spacing: .01em; }
+    h2 { font-size: 18px; line-height: 1.28; }
+    h3 { font-size: 12px; line-height: 1.38; }
+    h4 { font-size: 10px; }
+    .eyebrow { color: var(--orange); font-size: 8px; font-weight: 800; letter-spacing: .16em; }
+    .section-kicker { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+    .section-number { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; color: #fff; background: var(--gold); border-radius: 50%; font-size: 10px; font-weight: 800; }
+    .heading-line { width: 100%; height: 3px; margin: 12px 0 17px; background: linear-gradient(90deg, var(--gold) 0 106px, var(--line) 106px); }
+    .lead { max-width: 470px; color: #41454a; font-size: 10.5px; }
+    .muted { color: var(--sub); }
+    .small { font-size: 8.6px; }
+    .tiny { font-size: 7.6px; }
+    .gold { color: #9c6a13; }
+    .strong { font-weight: 800; }
+    .pill { display: inline-block; padding: 2px 7px; border-radius: 20px; color: #6d4b0d; background: var(--gold-light); font-size: 7.5px; font-weight: 800; }
+    .chip { display: inline-block; padding: 2px 6px; border-radius: 10px; background: #eaebe9; color: #464b50; font-size: 7px; font-weight: 800; }
+    .chip.green { background: #dcece3; color: #246046; }
+    .chip.orange { background: #fae2ce; color: #9c4a11; }
+    .chip.red { background: #f0d7d5; color: #98342d; }
+    .note { margin-top: 10px; padding: 8px 10px; border-left: 3px solid var(--gold); background: #f5f1e8; color: #44484d; font-size: 8.5px; }
+    .caution { margin-top: 8px; padding: 8px 10px; border-left: 3px solid var(--red); background: #f9edeb; color: #5b3632; font-size: 8.5px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    .card { border: 1px solid var(--line); border-radius: 6px; background: #fff; padding: 10px; }
+    .card h3 { margin-bottom: 5px; }
+    .check-list, .dash-list { margin: 5px 0 0; padding: 0; list-style: none; }
+    .check-list li, .dash-list li { position: relative; margin: 3px 0; padding-left: 12px; }
+    .check-list li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 900; }
+    .dash-list li::before { content: "•"; position: absolute; left: 2px; color: var(--gold); font-weight: 900; }
+    .steps { display: flex; align-items: stretch; gap: 0; margin: 12px 0; }
+    .step { position: relative; flex: 1; min-height: 54px; padding: 8px 7px; border: 1px solid var(--line); background: #fff; text-align: center; }
+    .step + .step::before { content: "›"; position: absolute; left: -10px; top: 17px; z-index: 1; color: var(--orange); font-size: 22px; font-weight: 300; }
+    .step strong { display: block; font-size: 9px; }
+    .step span { display: block; margin-top: 3px; color: var(--sub); font-size: 7.2px; line-height: 1.35; }
+    .screen-caption { margin-top: 5px; color: #6f7479; font-size: 7.7px; }
+
+    /* Cover */
+    .cover { padding: 0; color: #fff; background: var(--black); }
+    .cover::after { display: none; }
+    .cover-top-line { position: absolute; top: 0; right: 0; left: 0; height: 8px; background: linear-gradient(90deg, var(--gold), var(--orange)); }
+    .cover-watermark { position: absolute; right: -120px; bottom: -75px; width: 520px; opacity: .055; filter: grayscale(1) brightness(4); }
+    .cover-logo { position: absolute; top: 55px; left: 48px; width: 186px; height: 62px; object-fit: contain; object-position: left center; }
+    .cover-copy { position: absolute; top: 215px; left: 48px; }
+    .cover-copy .eyebrow { color: #f1c76c; }
+    .cover-copy h1 { margin-top: 13px; font-size: 36px; line-height: 1.22; }
+    .cover-copy p { margin-top: 16px; color: #d9dadd; font-size: 13px; }
+    .cover-band { position: absolute; right: 0; bottom: 96px; left: 0; padding: 20px 48px; border-top: 1px solid #55585c; border-bottom: 1px solid #55585c; background: rgba(255,255,255,.035); }
+    .cover-band p { color: #d7d7d5; font-size: 10px; }
+    .cover-meta { position: absolute; right: 48px; bottom: 41px; color: #a8aaad; font-size: 8px; text-align: right; }
+    .cover-meta strong { display: block; color: #f3d28c; letter-spacing: .09em; }
+
+    /* Navigation figure */
+    .app-map { display: grid; grid-template-columns: 128px 1fr; min-height: 228px; margin-top: 12px; border: 1px solid #3d4145; border-radius: 7px; overflow: hidden; background: #f6f4ef; }
+    .app-sidebar { padding: 13px 10px; color: #e9eaeb; background: var(--black); }
+    .app-sidebar .mini-logo { width: 73px; height: 20px; object-fit: contain; object-position: left; margin: 0 0 14px; }
+    .nav-dot { display: block; margin: 5px 0; padding: 5px 7px; border-radius: 3px; color: #d7d9da; font-size: 7.8px; }
+    .nav-dot.active { color: #1f1d18; background: var(--gold); font-weight: 800; }
+    .app-main { padding: 18px; }
+    .app-main h3 { margin: 3px 0 10px; font-size: 16px; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .metric { min-height: 65px; padding: 9px; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+    .metric span { display: block; color: var(--sub); font-size: 7px; }
+    .metric strong { display: block; margin-top: 7px; font-size: 15px; }
+
+    /* Generic screen mock */
+    .mock-screen { overflow: hidden; margin-top: 12px; border: 1px solid #50555a; border-radius: 6px; background: #f5f3ee; box-shadow: 0 3px 10px rgba(0,0,0,.09); }
+    .mock-top { display: flex; align-items: center; justify-content: space-between; height: 25px; padding: 0 10px; color: #f5f5f5; background: #24262a; font-size: 7px; }
+    .mock-top .dots { color: var(--gold); letter-spacing: 2px; }
+    .mock-body { padding: 10px; }
+    .mock-title { margin-bottom: 7px; color: #222529; font-size: 12px; font-weight: 800; }
+    .mock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .mock-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+    .mock-panel { min-height: 76px; padding: 7px; border: 1px solid #d5d4cf; border-radius: 3px; background: #fff; }
+    .mock-panel.dark { color: #f1f1f1; border-color: #34373a; background: #2a2d30; }
+    .mock-label { display: block; margin-bottom: 4px; color: #666a6f; font-size: 6.5px; font-weight: 800; letter-spacing: .06em; }
+    .mock-panel.dark .mock-label { color: #c5c6c5; }
+    .input-line { height: 14px; margin: 3px 0; padding: 2px 4px; border: 1px solid #dcdbd6; border-radius: 2px; color: #8b8e91; background: #fafafa; font-size: 6.2px; }
+    .input-line.gold { border-color: #d7ae62; background: #fff8e8; color: #6f4c10; }
+    .button-small { display: inline-block; margin-top: 4px; padding: 4px 7px; border-radius: 2px; color: #fff; background: var(--gold); font-size: 6.6px; font-weight: 800; }
+    .button-small.dark { background: #4e5358; }
+    .button-small.red { background: var(--red); }
+    .list-row { display: flex; align-items: center; justify-content: space-between; min-height: 17px; padding: 3px 4px; border-bottom: 1px solid #eee; color: #3c4044; font-size: 6.6px; }
+    .list-row.active { color: #5e410c; background: #fff2d3; }
+    .list-row:last-child { border-bottom: none; }
+    .field-key { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; margin-right: 4px; border-radius: 50%; color: #fff; background: var(--orange); font-size: 7px; font-weight: 800; }
+    .callout-list { margin: 9px 0 0; padding: 0; list-style: none; }
+    .callout-list li { margin: 4px 0; padding-left: 19px; text-indent: -19px; font-size: 8.3px; }
+    .callout-list .field-key { text-indent: 0; vertical-align: -2px; }
+
+    /* Table, timeline, phone */
+    .table { width: 100%; margin-top: 9px; border-collapse: collapse; font-size: 8px; }
+    .table th { padding: 5px 6px; color: #fff; background: #36393d; text-align: left; font-size: 7.2px; }
+    .table td { padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .table tr:nth-child(even) td { background: #f4f2ed; }
+    .timeline { position: relative; margin: 12px 0 0 8px; padding-left: 20px; border-left: 2px solid var(--gold); }
+    .timeline-item { position: relative; margin: 0 0 10px; }
+    .timeline-item::before { content: ""; position: absolute; top: 3px; left: -26px; width: 9px; height: 9px; border: 2px solid var(--paper); border-radius: 50%; background: var(--orange); }
+    .timeline-item strong { display: block; font-size: 9px; }
+    .timeline-item p { color: var(--sub); font-size: 8px; }
+    .phone-row { display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: center; margin-top: 14px; }
+    .phone { width: 105px; height: 206px; padding: 8px; border: 4px solid #2b2d30; border-radius: 18px; background: #191b1e; }
+    .phone-notch { width: 39px; height: 5px; margin: 0 auto 6px; border-radius: 4px; background: #4b4e51; }
+    .phone-screen { height: 171px; overflow: hidden; padding: 7px; border-radius: 10px; background: #f6f3ec; }
+    .phone-screen .phone-head { padding: 3px 4px 7px; color: #202225; font-size: 7px; font-weight: 800; }
+    .phone-screen .phone-card { margin: 4px 0; padding: 6px; border: 1px solid #ddd8cf; border-radius: 3px; background: #fff; font-size: 6px; }
+    .phone-screen .phone-cart { margin-top: 8px; padding: 6px; color: #fff; border-radius: 3px; background: var(--gold); font-size: 6px; font-weight: 800; }
+    .phone-screen .phone-nav { margin-top: 6px; padding-top: 4px; border-top: 1px solid #ddd8cf; color: #4b4e51; font-size: 5px; text-align: center; }
+    .permission-grid { display: grid; grid-template-columns: 1fr 68px 68px; margin-top: 9px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); font-size: 7.6px; }
+    .permission-grid span { min-height: 22px; padding: 5px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .permission-grid .head { color: #fff; background: #36393d; font-weight: 800; }
+    .yes { color: var(--green); font-weight: 900; text-align: center; }
+    .no { color: #a0a3a5; text-align: center; }
+    .status-flow { display: flex; align-items: center; gap: 5px; margin: 11px 0; }
+    .status { flex: 1; padding: 7px 4px; border-radius: 3px; color: #fff; text-align: center; font-size: 7.5px; font-weight: 800; }
+    .status.draft { background: #777d83; }.status.issued { background: var(--blue); }.status.paid { background: var(--green); }.status.cancel { background: var(--red); }
+    .arrow { color: #8d9194; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div class="cover-top-line"></div>
+    <img class="cover-watermark" src="../public/icons/sevens-logo.png" alt="">
+    <img class="cover-logo" src="../public/icons/sevens-logo.png" alt="SEVENS">
+    <div class="cover-copy">
+      <p class="eyebrow">INTEGRATED OPERATIONS WEB APP</p>
+      <h1>業務アプリ<br>操作説明書</h1>
+      <p>顧客・商品・レジ・売上・請求・帳票を、<br>ひとつの画面で扱うための基本ガイド</p>
+    </div>
+    <div class="cover-band"><p>この説明書は、PC操作は少しできるけれど、IT用語にはまだ慣れていない方を対象にしています。画面の名称とボタンの役割を確認しながら、ゆっくり操作してください。</p></div>
+    <div class="cover-meta"><strong>SEVENS</strong>第3版　2026年8月30日<br>対象：公開Webアプリ版</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">0</span><div><p class="eyebrow">GETTING STARTED</p><h2>はじめに：開き方と画面の見方</h2></div></div>
+    <div class="heading-line"></div>
+    <div class="two-col">
+      <div class="card"><h3>アプリを開く</h3><ol class="dash-list"><li>Chrome / Safari / Edge で、会社から案内されたURLを開きます。</li><li>管理者から受け取った<span class="strong">メールアドレス</span>と<span class="strong">パスワード</span>を入力します。</li><li><span class="pill">ログイン</span>を押します。</li></ol><p class="note">パスワードを忘れた場合は、管理者へ連絡してください。ログイン画面から自分で再発行する機能はありません。</p></div>
+      <div class="card"><h3>操作するときの約束</h3><ul class="check-list"><li>会計・保存中は、画面を閉じたり再読み込みしたりしないでください。</li><li>赤い「取消」「停止」は、内容を確認してから使います。</li><li>画面上部に「オフラインです」と出たときは、通信が戻ってから再試行します。</li><li>作業後は、左下の「ログアウト」を押します。</li></ul></div>
+    </div>
+    <div class="app-map">
+      <aside class="app-sidebar"><img class="mini-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="nav-dot active">ホーム</span><span class="nav-dot">レジ</span><span class="nav-dot">売上履歴</span><span class="nav-dot">顧客管理</span><span class="nav-dot">商品管理</span><span class="nav-dot">請求管理</span><span class="nav-dot">帳票発行</span></aside>
+      <div class="app-main"><p class="eyebrow">HOME</p><h3>今日の状況を確認</h3><div class="metric-grid"><div class="metric"><span>本日の売上</span><strong>¥ 128,000</strong></div><div class="metric"><span>本日の会計件数</span><strong>8 件</strong></div><div class="metric"><span>未請求</span><strong>—</strong></div><div class="metric"><span>登録顧客数</span><strong>356 件</strong></div></div><p class="screen-caption">画面イメージ：PCでは左のメニューから画面を切り替えます。「本日の会計件数」を押すと、当日発行した請求を検索できます。</p></div>
+    </div>
+    <p class="note"><span class="strong">スマートフォンの場合：</span>画面下部のメニューから移動します。スタッフは「ホーム／レジ／顧客／売上／請求／帳票」、管理者はさらに「商品／管理」が表示されます。</p>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">01</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">目</span><div><p class="eyebrow">CONTENTS</p><h2>目次：主な機能と業務の流れ</h2></div></div>
+    <div class="heading-line"></div>
+    <table class="table"><thead><tr><th style="width:34px">章</th><th>主な機能（READMEの機能一覧）</th><th>この説明書で分かること</th></tr></thead><tbody>
+      <tr><td>1</td><td><strong>顧客・車両管理</strong></td><td>顧客・車両の登録、検索、修正、停止</td></tr>
+      <tr><td>2</td><td><strong>商品カテゴリツリー・商品マスタ管理</strong></td><td>レジで使う分類・商品・単価・税率の準備</td></tr>
+      <tr><td>3</td><td><strong>レジ、現金のお釣り計算、全会計の請求自動作成</strong></td><td>商品選択から会計確定までの基本操作</td></tr>
+      <tr><td>4</td><td><strong>売上履歴・取消</strong></td><td>会計の探し方、内容確認、取消の考え方</td></tr>
+      <tr><td>5</td><td><strong>請求作成・発行・入金・取消</strong></td><td>請求書を作って状態を管理する方法</td></tr>
+      <tr><td>6</td><td><strong>SEVENSロゴ入りA4帳票のPDF保存</strong></td><td>請求書・領収書などをPDFとして保存する方法</td></tr>
+      <tr><td>7</td><td><strong>管理者によるユーザー作成・権限変更・利用停止・パスワード再設定</strong></td><td>利用者を安全に管理する方法</td></tr>
+    </tbody></table>
+    <h3 style="margin-top:19px">日常業務のおすすめ順序</h3>
+    <div class="steps"><div class="step"><strong>顧客を確認</strong><span>未選択でも会計可能<br>必要なら車両も選択</span></div><div class="step"><strong>商品・作業を追加</strong><span>カテゴリから順に選ぶ</span></div><div class="step"><strong>会計を確定</strong><span>支払方法と金額を確認</span></div><div class="step"><strong>売上・請求を確認</strong><span>両方が同時に保存される</span></div><div class="step"><strong>必要時に帳票</strong><span>請求書などをPDF保存</span></div></div>
+    <div class="two-col" style="margin-top:17px"><div class="card"><h3>管理者とスタッフの違い</h3><p>画面によって、使えるボタンが異なります。たとえば商品・価格の変更、売上の取消、請求の状態変更、ユーザー管理は管理者向けの操作です。</p></div><div class="card"><h3>「停止」「削除」「取消」について</h3><p>顧客・商品は「停止」または「削除」、売上・請求は「取消」として操作します。いずれも過去の売上・請求・帳票の履歴を残す仕組みです。</p></div></div>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">02</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">1</span><div><p class="eyebrow">CUSTOMERS / VEHICLES</p><h2>顧客・車両管理</h2></div></div>
+    <div class="heading-line"></div>
+    <p class="lead">「顧客管理」は、来店者とその車両を登録して、レジや請求で繰り返し使うための画面です。まずは顧客を保存し、その顧客を選んだ状態で車両を追加します。</p>
+    <div class="mock-screen"><div class="mock-top"><span class="dots">● ● ●</span><span>SEVENS / 顧客管理</span><span>管理者</span></div><div class="mock-body"><div class="mock-title">顧客管理</div><div class="mock-grid"><div class="mock-panel"><span class="mock-label"><span class="field-key">1</span>顧客を検索</span><div class="input-line">顧客番号・氏名・電話番号で検索</div><div class="list-row active"><span>田中 自動車　C000123</span><span>選択</span></div><div class="list-row"><span>佐藤 花子　C000124</span><span>選択</span></div><span class="button-small">＋ 顧客登録</span></div><div class="mock-panel"><span class="mock-label"><span class="field-key">2</span>顧客情報を入力</span><div class="input-line gold">顧客名　※必須</div><div class="input-line">電話番号　　携帯番号</div><div class="input-line">郵便番号</div><div class="input-line">住所1 / 住所2</div><span class="button-small">顧客を登録</span></div></div><div class="mock-grid" style="margin-top:7px"><div class="mock-panel"><span class="mock-label"><span class="field-key">3</span>登録車両</span><div class="list-row"><span>品川 123 あ 45-67<br><small>トヨタ / プリウス</small></span><span>編集</span></div><span class="button-small dark">＋ 車両を追加</span></div><div class="mock-panel"><span class="mock-label">車両入力欄</span><div class="input-line">登録番号　メーカー　車種名</div><div class="input-line">型式　年式　走行距離（km）</div><div class="input-line">車台番号　備考</div><span class="button-small">車両を保存</span></div></div></div></div>
+    <ul class="callout-list"><li><span class="field-key">1</span><strong>顧客を探す：</strong>顧客番号、氏名、電話番号、携帯番号の一部を入力します。該当する行を押すと、右側に情報が表示されます。</li><li><span class="field-key">2</span><strong>新しい顧客：</strong>顧客名だけは必須です。顧客番号は保存時に自動で作られます。</li><li><span class="field-key">3</span><strong>車両：</strong>顧客を保存してから「＋ 車両を追加」を押します。登録番号や車種が分かる範囲で入力します。</li></ul>
+    <div class="two-col" style="margin-top:10px"><div class="note"><strong>修正したいとき：</strong>左の一覧から顧客を選び、内容を書き換えて「変更を保存」を押します。</div><div class="caution"><strong>停止したいとき：</strong>「顧客を停止」は一覧とレジ候補から隠す操作です。過去の売上や請求は消えません。</div></div>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">03</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">2</span><div><p class="eyebrow">PRODUCT MASTER</p><h2>商品カテゴリツリー・商品マスタ管理</h2></div></div>
+    <div class="heading-line"></div>
+    <p class="lead">レジに表示する商品や作業は、先にここで準備します。最初に「カテゴリ」を作り、最後の階層に商品を登録します。例：<span class="pill">タイヤ</span> → <span class="pill">17インチ</span> → 商品。</p>
+    <div class="mock-screen"><div class="mock-top"><span class="dots">● ● ●</span><span>SEVENS / 商品管理</span><span>管理者</span></div><div class="mock-body"><div class="mock-title">商品管理　　<span class="chip">カテゴリツリー</span>　商品マスタ</div><div class="mock-grid"><div class="mock-panel"><span class="mock-label"><span class="field-key">1</span>カテゴリツリー</span><div class="list-row active"><span>▼ タイヤ</span><span>編集</span></div><div class="list-row"><span>　└ 15インチ</span><span>＋子</span></div><div class="list-row"><span>　└ 17インチ</span><span>＋子</span></div><div class="list-row"><span>▶ オイル</span><span>編集</span></div><span class="button-small">＋ 種別を追加</span></div><div class="mock-panel"><span class="mock-label"><span class="field-key">2</span>カテゴリを入力</span><div class="input-line gold">カテゴリ名　例：17インチ</div><div class="input-line">親カテゴリ　例：タイヤ</div><div class="input-line">並び順</div><span class="button-small">カテゴリを保存</span></div></div><div class="mock-grid" style="margin-top:7px"><div class="mock-panel"><span class="mock-label"><span class="field-key">3</span>商品一覧・検索</span><div class="input-line">商品名・コード・カテゴリで検索</div><div class="list-row active"><span>P000123　○○タイヤ 17インチ</span><span>編集</span></div><div class="list-row"><span>P000124　タイヤ交換作業</span><span>編集</span></div><span class="button-small">＋ 商品登録</span></div><div class="mock-panel"><span class="mock-label"><span class="field-key">4</span>商品を入力</span><div class="input-line">商品コード（空欄なら自動採番）</div><div class="input-line gold">商品名　※必須</div><div class="input-line gold">カテゴリ　※末端を選択</div><div class="input-line gold">単価（円）　税率</div><span class="button-small">商品を登録</span></div></div></div></div>
+    <div class="three-col" style="margin-top:10px"><div class="card"><h3>1. 分類を作る</h3><p>「種別を追加」で一番上の分類を作り、必要に応じて「＋子」でサイズ・メーカーなどの中間分類を作ります。</p></div><div class="card"><h3>2. 最後の分類を選ぶ</h3><p>商品は、商品を置く一番下のカテゴリにだけ登録します。途中の分類には商品を置けません。</p></div><div class="card"><h3>3. 価格を確認して保存</h3><p>単価は円で入力します。税率も必ず選択します。「有効」を外すと、レジ候補から一時的に外せます。</p></div></div>
+    <p class="note"><strong>登録を間違えたとき：</strong>商品は「商品を削除」、カテゴリは「カテゴリツリーを削除」で一覧・レジから外せます。カテゴリを削除すると配下のカテゴリ・商品もまとめて外れます。</p>
+    <p class="caution"><strong>重要：</strong>削除・停止は過去の売上、請求、帳票を変更しません。価格を後から変更しても、すでに確定した売上の金額は変わりません。</p>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">04</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">3</span><div><p class="eyebrow">POINT OF SALE</p><h2>レジ：商品を選んでカートへ入れる</h2></div></div>
+    <div class="heading-line"></div>
+    <p class="lead">PCのレジは、左から「カテゴリ」「商品」「会計内容」の3つの欄です。商品ボタンを押すと、すぐ右の会計内容へ追加されます。</p>
+    <div class="mock-screen"><div class="mock-top"><span class="dots">● ● ●</span><span>SEVENS / レジ</span><span>レジ担当</span></div><div class="mock-body"><div class="mock-title">レジ　　<span class="chip orange">タイヤ ＞ 17インチ</span></div><div class="mock-grid three"><div class="mock-panel dark"><span class="mock-label"><span class="field-key">1</span>種別</span><div class="list-row active"><span>タイヤ</span></div><div class="list-row"><span>オイル</span></div><div class="list-row"><span>バッテリー</span></div><div class="list-row"><span>部品</span></div><div class="list-row"><span>作業</span></div><span class="button-small">＋ その他</span></div><div class="mock-panel"><span class="mock-label"><span class="field-key">2</span>サイズ・商品</span><div class="input-line">商品名・コードで検索</div><div class="list-row active"><span>17インチ</span><span>選ぶ</span></div><div class="list-row"><span>○○タイヤ 17インチ</span><span>¥18,000</span></div><div class="list-row"><span>△△タイヤ 17インチ</span><span>¥21,000</span></div><span class="button-small">商品を押して追加</span></div><div class="mock-panel"><span class="mock-label"><span class="field-key">3</span>会計内容</span><div class="input-line gold">顧客を検索・選択</div><div class="list-row"><span>○○タイヤ<br><small>数量 1　単価 ¥18,000</small></span><strong>¥19,800</strong></div><div class="list-row"><span>小計 / 税</span><strong>¥19,800</strong></div><span class="button-small">会計内容を確認</span></div></div></div></div>
+    <div class="steps"><div class="step"><strong>顧客を選ぶ</strong><span>番号・氏名・電話で検索<br>一般客なら未選択でも可</span></div><div class="step"><strong>種別を押す</strong><span>タイヤ / オイル / 作業<br>など</span></div><div class="step"><strong>中間分類を押す</strong><span>サイズや規格へ進む<br>「戻る」も使用可</span></div><div class="step"><strong>商品を押す</strong><span>カートへ即追加<br>同じ商品は数量が増える</span></div></div>
+    <div class="two-col"><div class="card"><h3>顧客が初めての場合</h3><p>会計内容の「新規登録」から顧客を登録できます。登録後も、すでに追加した商品は消えずにレジへ戻れます。</p></div><div class="card"><h3>商品マスタにない作業の場合</h3><p>左の「＋ その他」を押し、内容・税抜単価・税率を入力してカートへ追加します。数量・割引は通常の商品と同様に変更できます。「その他」は商品マスタには登録されません。</p></div></div>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">05</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">3</span><div><p class="eyebrow">POINT OF SALE</p><h2>レジ：金額を確認して会計を確定する</h2></div></div>
+    <div class="heading-line"></div>
+    <div class="two-col"><div><div class="mock-screen"><div class="mock-top"><span class="dots">● ● ●</span><span>会計内容</span><span>¥ 19,800</span></div><div class="mock-body"><div class="mock-panel"><span class="mock-label"><span class="field-key">1</span>カートの明細</span><div class="list-row"><span>○○タイヤ<br><small>税率10%</small></span><strong>¥19,800</strong></div><div class="input-line">数量　1</div><div class="input-line">単価（円）　18,000　※管理者のみ変更可</div><div class="input-line">割引（円）　0</div><div class="list-row"><span>小計 / 割引 / 消費税</span><strong>¥19,800</strong></div></div><div class="mock-panel" style="margin-top:7px"><span class="mock-label"><span class="field-key">2</span>支払方法</span><div class="input-line gold">● 現金　○ カード　○ QR／電子決済</div><div class="input-line">預かり金（円）　20,000</div><div class="list-row active"><span>お釣り</span><strong>¥200</strong></div><span class="button-small">会計を確定</span></div></div></div></div><div><h3>会計前に確認すること</h3><ul class="check-list"><li>商品名・数量・割引が正しい。</li><li>現金なら、預かり金が合計以上になっている。</li><li>顧客・車両の選択は必要な場合だけ行う。</li><li>会計確定後、売上と請求が同時に保存される。</li></ul><h3 style="margin-top:14px">金額欄の意味</h3><table class="table"><tbody><tr><td><strong>数量</strong></td><td>0.001単位まで入力できます。</td></tr><tr><td><strong>単価</strong></td><td>管理者だけが変更できます。</td></tr><tr><td><strong>割引</strong></td><td>商品ごとの割引額を円で入れます。</td></tr><tr><td><strong>合計</strong></td><td>小計から割引を引き、消費税を加えた金額です。</td></tr></tbody></table></div></div>
+    <h3 style="margin-top:13px">支払方法と請求データの扱い</h3>
+    <div class="three-col"><div class="card"><h3>すべての支払方法</h3><p>現金・カード・QR・掛売など、どの支払方法でも会計と同時に請求データを1件作成します。</p></div><div class="card"><h3>顧客を選ばない場合</h3><p>一般客として会計できます。請求は「顧客未設定」で保存され、あとから一覧で確認できます。</p></div><div class="card"><h3>会計確定後</h3><p>売上番号と請求番号が表示されます。現金の場合は、お釣りも完了画面で確認できます。</p></div></div>
+    <p class="caution"><strong>会計を確定した後：</strong>商品の追加・変更はレジ画面では行えません。誤りがある場合は「売上履歴」で該当売上を確認し、管理者が取消を行います。</p>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">06</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">4</span><div><p class="eyebrow">SALES HISTORY</p><h2>売上履歴・取消</h2></div></div>
+    <div class="heading-line"></div>
+    <p class="lead">会計を確定すると、売上・明細・支払情報が保存されます。「売上履歴」では、過去の会計を検索し、内容や請求作成状況を確認できます。</p>
+    <div class="mock-screen"><div class="mock-top"><span class="dots">● ● ●</span><span>SEVENS / 売上履歴</span><span>管理者</span></div><div class="mock-body"><div class="mock-title">売上履歴</div><div class="mock-panel"><span class="mock-label"><span class="field-key">1</span>検索条件</span><div class="mock-grid"><div class="input-line">開始日　2026/08/01</div><div class="input-line">終了日　2026/08/31</div><div class="input-line">売上番号・顧客　例：SAL- / 田中</div><div class="input-line">支払方法 / 担当者</div></div><span class="button-small">検索</span></div><div class="mock-grid" style="margin-top:7px"><div class="mock-panel"><span class="mock-label"><span class="field-key">2</span>検索結果</span><div class="list-row active"><span>2026/08/11　SAL-000123<br><small>田中自動車 / 現金</small></span><strong>¥19,800</strong></div><div class="list-row"><span>2026/08/10　SAL-000122</span><strong>¥8,800</strong></div></div><div class="mock-panel"><span class="mock-label"><span class="field-key">3</span>売上詳細</span><div class="list-row"><span>顧客 / 車両 / 会計時刻</span></div><div class="list-row"><span>商品・数量・単価・税</span><strong>¥19,800</strong></div><div class="list-row"><span>支払方法　現金</span><span>お釣り ¥200</span></div><span class="button-small">請求データを作成</span> <span class="button-small red">この売上を取消</span></div></div></div></div>
+    <div class="two-col" style="margin-top:10px"><div class="card"><h3>売上を探す</h3><p>日付を指定し、売上番号・顧客名・支払方法・担当者で絞り込めます。結果の行を押すと右側に明細が出ます。</p></div><div class="card"><h3>請求との紐付きを確認</h3><p>新しいレジ会計には請求が自動で作られます。旧データなど請求未作成の売上には、管理者が詳細画面から請求を作成できます。</p></div></div>
+    <p class="caution"><strong>売上の取消（管理者のみ）：</strong>取消は「削除」ではありません。取消理由を入力して実行すると、記録は残ります。請求書がすでに有効な場合は、先に請求を取消してください。</p>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">07</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">5</span><div><p class="eyebrow">INVOICE MANAGEMENT</p><h2>請求作成・発行・入金・取消</h2></div></div>
+    <div class="heading-line"></div>
+    <p class="lead">請求データは、すべてのレジ会計と同時に自動作成されます。管理者は、売上に関係しない手動請求も登録できます。スタッフは一覧と詳細の確認を行えます。</p>
+    <div class="status-flow"><div class="status draft">下書き</div><span class="arrow">→</span><div class="status issued">発行済み</div><span class="arrow">→</span><div class="status paid">入金済み</div><span class="arrow">／</span><div class="status cancel">取消済み</div></div>
+    <div class="mock-screen"><div class="mock-top"><span class="dots">● ● ●</span><span>SEVENS / 請求管理</span><span>管理者</span></div><div class="mock-body"><div class="mock-title">請求管理</div><div class="mock-grid"><div class="mock-panel"><span class="mock-label"><span class="field-key">1</span>請求一覧</span><div class="input-line">発行開始日　2026/08/01</div><div class="input-line">発行終了日　2026/08/31</div><div class="input-line">請求番号・顧客・件名で検索</div><div class="input-line">状態：すべて / 下書き / 発行済み …</div><span class="button-small">検索</span> <span class="button-small dark">条件をクリア</span><div class="list-row active"><span>INV-000123　田中自動車<br><small>発行日 2026/08/11　<span class="chip">発行済み</span></small></span><strong>¥19,800</strong></div><span class="button-small">＋ 請求登録</span></div><div class="mock-panel"><span class="mock-label"><span class="field-key">2</span>請求詳細</span><div class="list-row"><span>顧客 / 件名 / 請求月 / 支払期限</span></div><div class="list-row"><span>作業・商品　数量　単価　税</span><strong>¥19,800</strong></div><div class="list-row"><span>小計 / 消費税 / 請求金額</span><strong>¥19,800</strong></div><span class="button-small">請求を発行済みにする</span> <span class="button-small red">請求を取消</span></div></div></div></div>
+    <div class="two-col" style="margin-top:10px"><div class="card"><h3>手動で請求を登録する（管理者）</h3><ol class="dash-list"><li>「＋ 請求登録」を押す。</li><li>必要なら請求先顧客を選び、件名・支払期限を入力。<strong>顧客と請求月は任意</strong>です。</li><li>「商品（任意）」を選ぶと内容・単価・税率が入ります。商品を選ばず自由に入力することもできます。</li><li>数量・単価・割引・税率を必要に応じて直し、「＋ 明細を追加」で行を増やします。</li><li>合計を確認し「請求データを作成」。</li></ol></div><div class="card"><h3>状態を変更する（管理者）</h3><ol class="dash-list"><li>内容確認後、下書きを「発行済み」にする。</li><li>入金を確認したら「入金済み」にする。</li><li>誤りの場合は理由を入れて「取消」。入金済みは取消できません。</li></ol></div></div>
+    <p class="note"><strong>検索と編集：</strong>発行開始日・発行終了日を指定すると、発行済み請求を日付で探せます。日付を空欄にして「検索」または「条件をクリア」を押すと、下書きを含めて表示します。手動登録した下書きは「請求を編集」で再保存できます（売上から作成した請求・発行済み請求は編集できません）。</p>
+    <p class="note"><strong>期限超過：</strong>支払期限を過ぎても入金済みでない発行済み請求は、一覧・詳細で「期限超過」と表示されます。</p>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">08</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">6</span><div><p class="eyebrow">PDF DOCUMENTS</p><h2>SEVENSロゴ入りA4帳票のPDF保存</h2></div></div>
+    <div class="heading-line"></div>
+    <p class="lead">帳票発行では、画面上でA4レイアウトを確認してから、ブラウザの印刷機能を使ってPDF保存します。帳票は端末に保存されます。</p>
+    <div class="two-col"><div><div class="mock-screen"><div class="mock-top"><span class="dots">● ● ●</span><span>SEVENS / 帳票発行</span><span>管理者</span></div><div class="mock-body"><div class="mock-title">帳票発行</div><div class="mock-panel"><span class="mock-label"><span class="field-key">1</span>帳票の選択</span><div class="input-line gold">帳票種別　請求書 ▼</div><div class="input-line gold">請求データ　INV-000123 / 田中自動車</div><span class="button-small">PDFとして保存</span></div><div class="mock-panel" style="margin-top:7px"><span class="mock-label"><span class="field-key">2</span>発行元設定</span><div class="input-line">会社名　郵便番号　住所　TEL　FAX</div><div class="input-line">振込先</div><span class="button-small dark">発行元設定を保存</span></div></div></div></div><div><div class="card" style="min-height:218px"><p class="eyebrow">A4 PREVIEW</p><h3 style="margin-top:4px">帳票に表示される主な内容</h3><div style="position:relative; height:163px; margin-top:8px; padding:13px; border:1px solid #b9b6ae; background:#fff"><img src="../public/icons/sevens-logo.png" alt="SEVENS" style="width:74px;height:21px;object-fit:contain;object-position:left"><strong style="position:absolute;right:13px;top:18px;font-size:12px">御請求書</strong><div style="margin-top:10px;border-top:1px solid #d6d3cc;border-bottom:1px solid #d6d3cc;padding:6px 0;font-size:7px">顧客名　／　件名　／　発行元情報　／　支払期限</div><div style="height:46px;margin-top:8px;border:1px solid #ddd9d0;background:linear-gradient(135deg,transparent 47%,rgba(198,147,50,.08) 47% 53%,transparent 53%);font-size:7px;padding:5px">明細（商品・作業、数量、単価、金額）<br><br>SEVENS ロゴの透かし</div><div style="position:absolute;right:13px;bottom:10px;text-align:right;font-size:7px">小計　¥18,000<br>消費税　¥1,800<br><strong>合計　¥19,800</strong></div></div></div></div></div>
+    <table class="table"><thead><tr><th>帳票種別</th><th>選ぶ元データ</th></tr></thead><tbody><tr><td>見積書／請求書／支払通知書／発注書／納品書</td><td>請求データ</td></tr><tr><td>領収書</td><td>確定済みの売上データ</td></tr></tbody></table>
+    <h3 style="margin-top:12px">PDF保存の手順</h3>
+    <div class="steps"><div class="step"><strong>1. 帳票種別を選ぶ</strong><span>請求書などを選択</span></div><div class="step"><strong>2. 元データを選ぶ</strong><span>請求または売上を選択</span></div><div class="step"><strong>3. プレビューを確認</strong><span>氏名・明細・合計を確認</span></div><div class="step"><strong>4. PDFとして保存</strong><span>印刷画面で保存先を指定</span></div></div>
+    <p class="note"><strong>Mac：</strong>印刷画面の左下にある「PDF」→「PDFとして保存」を選びます。<br><strong>Windows：</strong>プリンターで「Microsoft Print to PDF」を選び、保存先とファイル名を指定します。<br><strong>ポップアップが開かない場合：</strong>ブラウザでこのサイトのポップアップを許可してください。</p>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">09</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">7</span><div><p class="eyebrow">USER MANAGEMENT / ADMIN ONLY</p><h2>ユーザー作成・権限変更・利用停止・パスワード再設定</h2></div></div>
+    <div class="heading-line"></div>
+    <p class="lead">「ユーザー管理」は管理者だけが使える画面です。スタッフが増えたときや、退職・担当変更があったときに利用します。パスワードそのものは画面に保存・表示されません。</p>
+    <div class="mock-screen"><div class="mock-top"><span class="dots">● ● ●</span><span>SEVENS / ユーザー管理</span><span>管理者</span></div><div class="mock-body"><div class="mock-title">ユーザー管理</div><div class="mock-grid"><div class="mock-panel"><span class="mock-label"><span class="field-key">1</span>ユーザー一覧</span><div class="input-line">氏名・メールアドレスで検索</div><div class="list-row active"><span>山田 太郎<br><small>yamada@example.com</small></span><span><span class="chip green">有効</span><br><small>管理者</small></span></div><div class="list-row"><span>佐藤 花子<br><small>sato@example.com</small></span><span><span class="chip">有効</span><br><small>スタッフ</small></span></div><span class="button-small">＋ 新規登録</span></div><div class="mock-panel"><span class="mock-label"><span class="field-key">2</span>ユーザー登録</span><div class="input-line">表示名　例：山田 太郎</div><div class="input-line gold">権限　スタッフ / 管理者</div><div class="input-line gold">メールアドレス　※必須</div><div class="input-line gold">初期パスワード　10文字以上</div><span class="button-small">ユーザーを登録</span></div></div></div></div>
+    <div class="permission-grid"><span class="head">できること</span><span class="head" style="text-align:center">管理者</span><span class="head" style="text-align:center">スタッフ</span><span>レジ、顧客の登録・編集、売上・請求の参照、帳票発行</span><span class="yes">○</span><span class="yes">○</span><span>商品・カテゴリの編集、単価変更、売上取消、請求の発行・入金・取消</span><span class="yes">○</span><span class="no">—</span><span>発行元設定、ユーザー管理</span><span class="yes">○</span><span class="no">—</span></div>
+    <div class="two-col" style="margin-top:10px"><div class="card"><h3>新しい利用者を追加する</h3><ol class="dash-list"><li>「＋ 新規登録」を押す。</li><li>表示名・権限・メールアドレス・初期パスワード（10文字以上）を入力。</li><li>「ユーザーを登録」を押す。</li><li>初期パスワードは、メール以外も含め安全な方法で本人へ伝えます。</li></ol></div><div class="card"><h3>変更・停止・再設定</h3><ul class="dash-list"><li>一覧で対象者を選び、表示名・権限・利用許可を変更して保存します。</li><li>利用停止は、次回操作時からアクセスできなくする操作です。履歴は残ります。</li><li>パスワード再設定は、対象者を選んで新しいものを入力します。</li></ul></div></div>
+    <p class="caution"><strong>安全のための制限：</strong>ログイン中の自分自身は、この画面から変更できません。また、最後の有効な管理者をスタッフへ変更したり停止したりすることはできません。</p>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">10</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">補</span><div><p class="eyebrow">SMARTPHONE / DAILY USE</p><h2>スマートフォンでの使い方と日常チェック</h2></div></div>
+    <div class="heading-line"></div>
+    <div class="phone-row"><div class="phone"><div class="phone-notch"></div><div class="phone-screen"><div class="phone-head">レジ</div><div class="phone-card">種別<br><strong>タイヤ</strong></div><div class="phone-card">商品<br><strong>○○タイヤ 17インチ</strong><br>¥18,000</div><div class="phone-card">商品を押すとカートへ追加</div><div class="phone-cart">カート 1点　¥19,800　確認 →</div><div class="phone-nav">ホーム　レジ　顧客　売上<br>請求　帳票　商品※　管理※</div></div></div><div><h3>スマートフォンのレジと下部メニュー</h3><p>画面が狭いため、商品を選ぶ画面と会計内容を切り替えて使います。画面下部の<span class="pill">カート ○点／合計金額</span>を押すと、会計内容が前面に開きます。</p><ul class="check-list"><li>スタッフは「ホーム／レジ／顧客／売上／請求／帳票」を使えます。</li><li>管理者は、さらに「商品／管理」も使えます（図中の※）。</li><li>「帳票」から、スマートフォンでもPDF保存画面を開けます。</li><li>「閉じる」で商品選択へ戻れます。会計確定、顧客選択、支払方法はカート画面内で行います。</li></ul></div></div>
+    <p class="note"><strong>iPhone Safariでの入力：</strong>検索条件、預かり金、カート明細、請求登録の入力欄は、画面幅に応じて縦に並びます。入力欄を押しても画面を大きく拡大しない設計です。下部メニューに隠れそうなときは、画面を少し上へスクロールして入力してください。</p>
+    <h3 style="margin-top:16px">毎日の基本チェック</h3>
+    <div class="three-col"><div class="card"><h3>営業開始時</h3><ul class="check-list"><li>ネット接続を確認</li><li>ホームで本日の状況を確認</li><li>新しい商品・価格を確認</li></ul></div><div class="card"><h3>会計の都度</h3><ul class="check-list"><li>必要なら顧客・車両を選択</li><li>商品・数量・割引を確認</li><li>支払方法・預かり金を確認</li></ul></div><div class="card"><h3>営業終了時</h3><ul class="check-list"><li>売上履歴の件数・金額を確認</li><li>売上ごとの請求番号を確認</li><li>共有端末はログアウト</li></ul></div></div>
+    <h3 style="margin-top:15px">よくある表示と対応</h3>
+    <table class="table"><thead><tr><th>表示・困ったこと</th><th>まず行うこと</th></tr></thead><tbody><tr><td>「オフラインです」</td><td>Wi‑Fiや通信状態を確認します。通信が戻るまで会計確定を繰り返し押さず、戻ったら同じ操作を再試行します。</td></tr><tr><td>「権限がありません」</td><td>スタッフでは利用できない操作です。商品編集・取消などは管理者へ依頼します。</td></tr><tr><td>ログインできない</td><td>メールアドレスとパスワードを確認します。解決しない場合は管理者にパスワード再設定を依頼します。</td></tr><tr><td>帳票の保存画面が出ない</td><td>ブラウザがポップアップを止めていないか確認し、このサイトのポップアップを許可します。</td></tr></tbody></table>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">11</span>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker"><span class="section-number">完</span><div><p class="eyebrow">QUICK REFERENCE</p><h2>最後に：困ったときの早見表</h2></div></div>
+    <div class="heading-line"></div>
+    <div class="timeline"><div class="timeline-item"><strong>顧客が見つからない</strong><p>顧客管理で氏名・電話番号を確認します。未登録なら、レジ内または顧客管理から新規登録します。</p></div><div class="timeline-item"><strong>商品がレジに出ない</strong><p>商品管理で「有効」になっているか、末端カテゴリに登録されているか、税率が選ばれているかを管理者が確認します。</p></div><div class="timeline-item"><strong>会計を間違えた</strong><p>会計確定後は、売上履歴で該当売上を確認します。管理者が理由を入れて取消します。履歴は残ります。</p></div><div class="timeline-item"><strong>請求を発行したい</strong><p>請求管理で下書きの請求を開き、内容を確認して「請求を発行済みにする」を押します。</p></div><div class="timeline-item"><strong>帳票を送付したい</strong><p>帳票発行でプレビューを確認し、PDFとして保存します。保存したPDFをメール添付などで送付します。</p></div></div>
+    <div class="two-col" style="margin-top:16px"><div class="card"><h3>データを守るために</h3><ul class="check-list"><li>アカウントを他人と共有しない。</li><li>管理者パスワードは特に慎重に管理する。</li><li>会計中に複数の端末で同じ内容を確定しない。</li><li>取消は履歴を残すため、理由を記録する。</li></ul></div><div class="card"><h3>この説明書の対象範囲</h3><p>この説明書は、現在公開されているSEVENS統合業務Webアプリの標準操作を説明しています。会社ごとの運用ルールや商品価格の決め方は、社内の責任者に確認してください。</p></div></div>
+    <div style="position:absolute;left:42px;right:42px;bottom:83px;padding:18px;border:1px solid #d8b467;background:#fff9e9;text-align:center"><img src="../public/icons/sevens-logo.png" alt="SEVENS" style="width:96px;height:27px;object-fit:contain"><p style="margin-top:8px;font-size:11px;font-weight:800">安全に、正確に、日々の業務をひとつに。</p><p class="small muted" style="margin-top:3px">操作で迷った場合は、自己判断で取消・停止をせず、まず管理者に相談してください。</p></div>
+    <img class="footer-logo" src="../public/icons/sevens-logo.png" alt="SEVENS"><span class="page-number">12</span>
+  </section>
+</body>
+</html>
