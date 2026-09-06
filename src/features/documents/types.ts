@@ -56,5 +56,8 @@ export type DocumentData = {
   lines: DocumentLine[];
   subtotalYen: number;
   taxAmountYen: number;
+  preOrderDiscountTotalYen: number;
+  orderDiscountAmountYen: number;
+  orderDiscountRateBasisPoints: number | null;
   totalAmountYen: number;
 };

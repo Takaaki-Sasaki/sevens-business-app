@@ -7,7 +7,7 @@ import { categoryPath } from '../products/categoryTree';
 import { getTaxRoundingMode, listActiveCategories, listActiveProducts, listPaymentMethods, listTaxRates } from '../products/productApi';
 import type { PaymentMethod, Product, ProductCategory, TaxRate } from '../products/types';
 import { CartPanel } from './CartPanel';
-import { addProductToCart, calculateCart, calculateCashSettlement, createCustomCartLine, formatQuantity, parseYen, type CartLine, type TaxRoundingMode, updateCartLine } from './cart';
+import { addProductToCart, calculateCart, calculateCashSettlement, calculateOrderDiscount, createCustomCartLine, formatQuantity, parseYen, type CartLine, type TaxRoundingMode, updateCartLine } from './cart';
 import { CustomerSelector } from './CustomerSelector';
 import { PaymentPanel } from './PaymentPanel';
 import { PosCategoryPanel } from './PosCategoryPanel';
@@ -34,6 +34,8 @@ export function PosPage({ profile }: { profile: Profile }) {
   const [cartLines, setCartLines] = useState<CartLine[]>([]);
   const [paymentMethodId, setPaymentMethodId] = useState('');
   const [amountReceivedInput, setAmountReceivedInput] = useState('');
+  const [discountAmountInput, setDiscountAmountInput] = useState('');
+  const [discountRateInput, setDiscountRateInput] = useState('');
   const [isCustomerFormOpen, setCustomerFormOpen] = useState(false);
   const [isOtherItemFormOpen, setOtherItemFormOpen] = useState(false);
   const [checkoutKey, setCheckoutKey] = useState(() => crypto.randomUUID());
@@ -76,14 +78,22 @@ export function PosPage({ profile }: { profile: Profile }) {
     [search, products, categories, currentCategoryId],
   );
   const cartTotals = useMemo(() => calculateCart(cartLines, roundingMode), [cartLines, roundingMode]);
+  const orderDiscount = useMemo(
+    () => calculateOrderDiscount(cartTotals.total_amount_yen, discountAmountInput, discountRateInput, roundingMode),
+    [cartTotals.total_amount_yen, discountAmountInput, discountRateInput, roundingMode],
+  );
   const selectedQuantity = formatQuantity(cartLines.reduce((total, line) => total + line.quantity_milli, 0));
   const allowPriceOverride = hasPermission(profile.role, 'pos.price_override');
   const selectedPaymentMethod = paymentMethods.find((method) => method.id === paymentMethodId);
   const amountReceivedYen = parseYen(amountReceivedInput);
-  const cashSettlement = calculateCashSettlement(cartTotals.total_amount_yen, amountReceivedYen || 0);
+  const cashSettlement = calculateCashSettlement(orderDiscount.total_amount_yen, amountReceivedYen ?? 0);
   const checkoutDisabled = cartLines.length === 0
     || !selectedPaymentMethod
-    || (selectedPaymentMethod.code === 'cash' && (amountReceivedYen === null || cashSettlement.shortfall_yen > 0));
+    || !!orderDiscount.error
+    || (selectedPaymentMethod.code === 'cash'
+      && ((amountReceivedInput.trim() !== '' && amountReceivedYen === null)
+        || (orderDiscount.total_amount_yen > 0 && amountReceivedYen === null)
+        || cashSettlement.shortfall_yen > 0));
 
   function invalidateCheckout() {
     setCheckoutKey(crypto.randomUUID());
@@ -131,12 +141,16 @@ export function PosPage({ profile }: { profile: Profile }) {
         customerId: selectedCustomer?.id,
         vehicleId: selectedVehicleId,
         paymentMethodId: selectedPaymentMethod.id,
-        amountReceivedYen: selectedPaymentMethod.code === 'cash' ? amountReceivedYen || undefined : undefined,
+        amountReceivedYen: selectedPaymentMethod.code === 'cash' ? (amountReceivedYen ?? 0) : undefined,
+        orderDiscountAmountYen: orderDiscount.type === 'amount' ? orderDiscount.input_amount_yen ?? 0 : undefined,
+        orderDiscountRateBasisPoints: orderDiscount.type === 'rate' ? orderDiscount.rate_basis_points ?? 0 : undefined,
         lines: cartLines,
       });
       setCompletedSale(result);
       setCartLines([]);
       setAmountReceivedInput('');
+      setDiscountAmountInput('');
+      setDiscountRateInput('');
       setMobileCartOpen(false);
       invalidateCheckout();
     } catch (caught) {
@@ -212,6 +226,7 @@ export function PosPage({ profile }: { profile: Profile }) {
           />
           <CartPanel
             totals={cartTotals}
+            orderDiscount={orderDiscount}
             allowPriceOverride={allowPriceOverride}
             onUpdate={updateLine}
             onRemove={(lineId) => {
@@ -240,7 +255,19 @@ export function PosPage({ profile }: { profile: Profile }) {
               setAmountReceivedInput(value);
               invalidateCheckout();
             }}
-            totals={cartTotals}
+            discountAmountInput={discountAmountInput}
+            discountRateInput={discountRateInput}
+            onDiscountAmountChange={(value) => {
+              if (isCheckingOut) return;
+              setDiscountAmountInput(value);
+              invalidateCheckout();
+            }}
+            onDiscountRateChange={(value) => {
+              if (isCheckingOut) return;
+              setDiscountRateInput(value);
+              invalidateCheckout();
+            }}
+            orderDiscount={orderDiscount}
             onCheckout={() => void handleCheckout()}
             checkoutPending={isCheckingOut}
             checkoutDisabled={checkoutDisabled}
@@ -256,7 +283,7 @@ export function PosPage({ profile }: { profile: Profile }) {
         onClick={() => setMobileCartOpen(true)}
       >
         <span>カート {selectedQuantity} 点</span>
-        <strong>¥{cartTotals.total_amount_yen.toLocaleString()}　確認 →</strong>
+        <strong>¥{orderDiscount.total_amount_yen.toLocaleString()}　確認 →</strong>
       </button>
 
       {isCustomerFormOpen && (

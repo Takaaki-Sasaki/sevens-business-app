@@ -30,6 +30,8 @@ describe('売上確定リクエスト', () => {
       p_vehicle_id: '955a9bfa-b777-4ebc-889a-f17fb508e5c4',
       p_payment_method_id: '4f9d5ac3-976c-4b10-a97c-0d0f60e351f8',
       p_amount_received_yen: 5000,
+      p_order_discount_amount_yen: null,
+      p_order_discount_rate_basis_points: null,
       p_lines: [{ product_id: product.id, quantity_milli: 2500, unit_price_yen: 1800, discount_yen: 100 }],
     });
     expect(payload.p_sale_date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
@@ -47,6 +49,24 @@ describe('売上確定リクエスト', () => {
     expect(payload.p_vehicle_id).toBeNull();
     expect(payload.p_amount_received_yen).toBeNull();
     expect(payload.p_create_invoice).toBe(true);
+    expect(payload.p_order_discount_amount_yen).toBeNull();
+    expect(payload.p_order_discount_rate_basis_points).toBeNull();
+  });
+
+  it('会計全体の金額割引または割合割引をRPCへ渡す', () => {
+    const base = {
+      idempotencyKey: '91f8b817-5845-4fd8-87b7-c16e50c3d35e',
+      paymentMethodId: '4f9d5ac3-976c-4b10-a97c-0d0f60e351f8',
+      lines: [line],
+    };
+    expect(createCheckoutPayload({ ...base, orderDiscountAmountYen: 1000 })).toMatchObject({
+      p_order_discount_amount_yen: 1000,
+      p_order_discount_rate_basis_points: null,
+    });
+    expect(createCheckoutPayload({ ...base, orderDiscountRateBasisPoints: 550 })).toMatchObject({
+      p_order_discount_amount_yen: null,
+      p_order_discount_rate_basis_points: 550,
+    });
   });
 
   it('通信を再試行しても同じ会計キーを維持する', () => {

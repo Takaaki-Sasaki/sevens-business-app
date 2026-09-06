@@ -10,6 +10,10 @@ export type Sale = {
   sale_date: string;
   subtotal_yen: number;
   tax_amount_yen: number;
+  pre_order_discount_total_yen: number;
+  order_discount_type: 'none' | 'amount' | 'rate';
+  order_discount_amount_yen: number;
+  order_discount_rate_basis_points: number | null;
   total_amount_yen: number;
   primary_payment_method_id: string | null;
   amount_received_yen: number | null;
@@ -57,6 +61,10 @@ export type SaleCheckoutResult = {
   subtotal_yen: number;
   discount_yen: number;
   tax_amount_yen: number;
+  pre_order_discount_total_yen: number;
+  order_discount_type: 'none' | 'amount' | 'rate';
+  order_discount_amount_yen: number;
+  order_discount_rate_basis_points: number | null;
   total_amount_yen: number;
   change_amount_yen: number;
   status: 'confirmed';

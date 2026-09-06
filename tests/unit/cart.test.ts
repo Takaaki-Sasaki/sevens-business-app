@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addProductToCart, calculateCart, calculateCashSettlement, calculateLine, createCartLine, formatQuantity, parseQuantity, type CartLine } from '../../src/features/pos/cart';
+import { addProductToCart, calculateCart, calculateCashSettlement, calculateLine, calculateOrderDiscount, createCartLine, formatQuantity, parseDiscountRateBasisPoints, parseQuantity, type CartLine } from '../../src/features/pos/cart';
 import type { Product, TaxRate } from '../../src/features/products/types';
 
 const product: Product = {
@@ -31,6 +31,31 @@ describe('レジ金額計算', () => {
   it('現金の預かり金からお釣りと不足額を算出する', () => {
     expect(calculateCashSettlement(1200, 2000)).toEqual({ change_yen: 800, shortfall_yen: 0 });
     expect(calculateCashSettlement(1200, 1000)).toEqual({ change_yen: 0, shortfall_yen: 200 });
+  });
+
+  it('会計全体の金額割引を税計算後合計から差し引く', () => {
+    const discounted = calculateOrderDiscount(10_000, '1,000', '', 'round');
+    expect(discounted).toMatchObject({
+      type: 'amount', input_amount_yen: 1000, rate_basis_points: null,
+      discount_amount_yen: 1000, total_amount_yen: 9000, error: null,
+    });
+    expect(calculateCashSettlement(discounted.total_amount_yen, 10_000)).toEqual({ change_yen: 1000, shortfall_yen: 0 });
+  });
+
+  it('会計全体の割合割引を既存の端数設定で整数円に丸める', () => {
+    expect(calculateOrderDiscount(10_000, '', '10', 'round')).toMatchObject({ type: 'rate', rate_basis_points: 1000, discount_amount_yen: 1000, total_amount_yen: 9000 });
+    expect(calculateOrderDiscount(105, '', '5.5', 'floor').discount_amount_yen).toBe(5);
+    expect(calculateOrderDiscount(105, '', '5.5', 'round').discount_amount_yen).toBe(6);
+    expect(calculateOrderDiscount(105, '', '5.5', 'ceil').discount_amount_yen).toBe(6);
+  });
+
+  it('割引なし、100%割引、割引入力エラーを区別する', () => {
+    expect(calculateOrderDiscount(10_000, '', '', 'round')).toMatchObject({ type: 'none', discount_amount_yen: 0, total_amount_yen: 10_000, error: null });
+    expect(calculateOrderDiscount(10_000, '', '100', 'round')).toMatchObject({ discount_amount_yen: 10_000, total_amount_yen: 0, error: null });
+    expect(calculateOrderDiscount(10_000, '1000', '10', 'round').error).toContain('同時');
+    expect(calculateOrderDiscount(10_000, '15000', '', 'round').error).toContain('以下');
+    expect(calculateOrderDiscount(10_000, '', '101', 'round').error).toContain('0〜100');
+    expect(parseDiscountRateBasisPoints('5.5')).toBe(550);
   });
 
   it('同じ商品を続けて追加すると数量を加算する', () => {

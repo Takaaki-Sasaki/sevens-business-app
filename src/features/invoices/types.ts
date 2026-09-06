@@ -29,6 +29,10 @@ export type Invoice = {
   due_date: string | null;
   subtotal_yen: number;
   tax_amount_yen: number;
+  pre_order_discount_total_yen: number;
+  order_discount_type: 'none' | 'amount' | 'rate';
+  order_discount_amount_yen: number;
+  order_discount_rate_basis_points: number | null;
   total_amount_yen: number;
   status: InvoiceStatus;
   issued_at: string | null;

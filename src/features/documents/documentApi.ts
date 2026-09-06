@@ -78,7 +78,12 @@ export async function createDocumentData(input: { organizationId: string; kind: 
       bankInformation: input.issuer.bank_information,
       issuer: input.issuer,
       lines: detail.items.map((item) => ({ name: item.item_name_snapshot, quantity: item.quantity, unitPriceYen: item.unit_price_yen, amountYen: item.line_total_yen })),
-      subtotalYen: detail.invoice.subtotal_yen, taxAmountYen: detail.invoice.tax_amount_yen, totalAmountYen: detail.invoice.total_amount_yen,
+      subtotalYen: detail.invoice.subtotal_yen,
+      taxAmountYen: detail.invoice.tax_amount_yen,
+      preOrderDiscountTotalYen: detail.invoice.pre_order_discount_total_yen ?? detail.invoice.total_amount_yen,
+      orderDiscountAmountYen: detail.invoice.order_discount_amount_yen ?? 0,
+      orderDiscountRateBasisPoints: detail.invoice.order_discount_rate_basis_points ?? null,
+      totalAmountYen: detail.invoice.total_amount_yen,
     };
   }
 
@@ -91,7 +96,12 @@ export async function createDocumentData(input: { organizationId: string; kind: 
     bankInformation: null,
     issuer: input.issuer,
     lines: detail.items.map((item) => ({ name: item.product_name_snapshot, quantity: item.quantity, unitPriceYen: item.unit_price_yen, amountYen: item.line_total_yen })),
-    subtotalYen: detail.sale.subtotal_yen, taxAmountYen: detail.sale.tax_amount_yen, totalAmountYen: detail.sale.total_amount_yen,
+    subtotalYen: detail.sale.subtotal_yen,
+    taxAmountYen: detail.sale.tax_amount_yen,
+    preOrderDiscountTotalYen: detail.sale.pre_order_discount_total_yen ?? detail.sale.total_amount_yen,
+    orderDiscountAmountYen: detail.sale.order_discount_amount_yen ?? 0,
+    orderDiscountRateBasisPoints: detail.sale.order_discount_rate_basis_points ?? null,
+    totalAmountYen: detail.sale.total_amount_yen,
   };
 }
 

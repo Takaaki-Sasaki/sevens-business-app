@@ -3,7 +3,7 @@ import { requireSupabase } from '../../shared/lib/supabase';
 import type { Sale, SaleCheckoutResult, SaleDetail, SaleFilters, SaleItem, SaleOperator, SalePayment, SaleVehicleSnapshot } from './types';
 import type { InvoiceLink } from '../invoices/types';
 
-const saleFields = 'id, organization_id, sale_number, customer_id, customer_name_snapshot, vehicle_id, sale_date, subtotal_yen, tax_amount_yen, total_amount_yen, primary_payment_method_id, amount_received_yen, change_amount_yen, status, operator_id, confirmed_at, cancelled_at, cancelled_by, cancellation_reason, created_at, updated_at';
+const saleFields = 'id, organization_id, sale_number, customer_id, customer_name_snapshot, vehicle_id, sale_date, subtotal_yen, tax_amount_yen, pre_order_discount_total_yen, order_discount_type, order_discount_amount_yen, order_discount_rate_basis_points, total_amount_yen, primary_payment_method_id, amount_received_yen, change_amount_yen, status, operator_id, confirmed_at, cancelled_at, cancelled_by, cancellation_reason, created_at, updated_at';
 const saleItemFields = 'id, sale_id, product_id, product_code_snapshot, product_name_snapshot, quantity, unit_price_yen, discount_yen, tax_rate_basis_points, line_subtotal_yen, tax_amount_yen, line_total_yen, sort_order';
 const paymentFields = 'id, sale_id, payment_method_id, payment_method_name_snapshot, amount_yen, amount_received_yen, change_amount_yen, created_at';
 
@@ -39,6 +39,8 @@ export function createCheckoutPayload(input: {
   vehicleId?: string;
   paymentMethodId: string;
   amountReceivedYen?: number;
+  orderDiscountAmountYen?: number;
+  orderDiscountRateBasisPoints?: number;
   invoiceSubject?: string;
   billingMonth?: string;
   dueDate?: string;
@@ -51,6 +53,8 @@ export function createCheckoutPayload(input: {
     p_sale_date: localSaleDate(),
     p_payment_method_id: input.paymentMethodId,
     p_amount_received_yen: input.amountReceivedYen ?? null,
+    p_order_discount_amount_yen: input.orderDiscountAmountYen ?? null,
+    p_order_discount_rate_basis_points: input.orderDiscountRateBasisPoints ?? null,
     // RPCの後方互換用引数。現在はすべての会計で請求を自動作成する。
     p_create_invoice: true,
     p_invoice_subject: input.invoiceSubject?.trim() || null,

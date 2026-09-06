@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
-import { formatQuantity, parseQuantity, parseYen, type CartLine, type CartTotals } from './cart';
+import { formatQuantity, parseQuantity, parseYen, type CartLine, type CartTotals, type OrderDiscountCalculation } from './cart';
 
 type CartPanelProps = {
   totals: CartTotals;
+  orderDiscount: OrderDiscountCalculation;
   allowPriceOverride: boolean;
   onUpdate: (lineId: string, patch: Partial<Pick<CartLine, 'quantity_milli' | 'unit_price_yen' | 'discount_yen'>>) => void;
   onRemove: (lineId: string) => void;
   onClear: () => void;
 };
 
-export function CartPanel({ totals, allowPriceOverride, onUpdate, onRemove, onClear }: CartPanelProps) {
+export function CartPanel({ totals, orderDiscount, allowPriceOverride, onUpdate, onRemove, onClear }: CartPanelProps) {
   return (
     <section className="pos-cart" id="selected-items" aria-labelledby="cart-title">
       <div className="pos-section-heading">
@@ -40,7 +41,7 @@ export function CartPanel({ totals, allowPriceOverride, onUpdate, onRemove, onCl
                   <YenInput value={line.unit_price_yen} disabled={!allowPriceOverride} title={allowPriceOverride ? '単価を変更できます' : '単価変更は管理者のみ可能です'} onCommit={(value) => onUpdate(line.id, { unit_price_yen: value })} />
                 </label>
                 <label>
-                  <span>割引（円）</span>
+                  <span>明細割引（円）</span>
                   <YenInput value={line.discount_yen} onCommit={(value) => onUpdate(line.id, { discount_yen: value })} />
                 </label>
               </div>
@@ -55,9 +56,11 @@ export function CartPanel({ totals, allowPriceOverride, onUpdate, onRemove, onCl
       )}
       <div className="cart-totals">
         <div><span>小計</span><strong>¥{totals.subtotal_yen.toLocaleString()}</strong></div>
-        <div><span>割引</span><strong>− ¥{totals.discount_yen.toLocaleString()}</strong></div>
+        <div><span>明細割引</span><strong>− ¥{totals.discount_yen.toLocaleString()}</strong></div>
         <div><span>消費税</span><strong>¥{totals.tax_amount_yen.toLocaleString()}</strong></div>
-        <div className="cart-grand-total"><span>合計</span><strong>¥{totals.total_amount_yen.toLocaleString()}</strong></div>
+        <div><span>割引前合計</span><strong>¥{orderDiscount.pre_discount_total_yen.toLocaleString()}</strong></div>
+        <div><span>会計割引</span><strong>{orderDiscount.discount_amount_yen ? `− ¥${orderDiscount.discount_amount_yen.toLocaleString()}` : '¥0'}</strong></div>
+        <div className="cart-grand-total"><span>合計</span><strong>¥{orderDiscount.total_amount_yen.toLocaleString()}</strong></div>
       </div>
       {!allowPriceOverride && totals.lines.length > 0 && <p className="permission-note">単価変更は管理者のみ可能です。</p>}
     </section>

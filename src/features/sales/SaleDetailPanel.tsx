@@ -3,6 +3,7 @@ import { hasPermission } from '../auth/permissions';
 import type { Profile } from '../auth/types';
 import type { CreateInvoiceFromSaleInput } from '../invoices/types';
 import type { SaleDetail } from './types';
+import { formatDiscountRate } from '../pos/cart';
 
 type SaleDetailPanelProps = {
   detail?: SaleDetail;
@@ -64,6 +65,10 @@ export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling
   }
 
   const { sale, items, payments } = detail;
+  const lineDiscountYen = items.reduce((total, item) => total + item.discount_yen, 0);
+  const orderDiscountLabel = sale.order_discount_rate_basis_points === null
+    ? '会計割引'
+    : `会計割引（${formatDiscountRate(sale.order_discount_rate_basis_points)}%）`;
   return (
     <section className="panel sale-detail-panel" aria-labelledby="sale-detail-title">
       <header className="panel-heading sale-detail-heading">
@@ -108,7 +113,10 @@ export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling
           </div>
           <dl className="sale-totals">
             <div><dt>小計</dt><dd>¥{sale.subtotal_yen.toLocaleString()}</dd></div>
+            {lineDiscountYen > 0 && <div><dt>明細割引</dt><dd>−¥{lineDiscountYen.toLocaleString()}</dd></div>}
             <div><dt>消費税</dt><dd>¥{sale.tax_amount_yen.toLocaleString()}</dd></div>
+            <div><dt>割引前合計</dt><dd>¥{sale.pre_order_discount_total_yen.toLocaleString()}</dd></div>
+            <div><dt>{orderDiscountLabel}</dt><dd>{sale.order_discount_amount_yen ? `−¥${sale.order_discount_amount_yen.toLocaleString()}` : '¥0'}</dd></div>
             <div className="grand"><dt>合計</dt><dd>¥{sale.total_amount_yen.toLocaleString()}</dd></div>
           </dl>
         </div>

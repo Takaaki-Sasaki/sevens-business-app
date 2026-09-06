@@ -30,6 +30,18 @@ export type CartTotals = {
   total_amount_yen: number;
 };
 
+export type OrderDiscountType = 'none' | 'amount' | 'rate';
+
+export type OrderDiscountCalculation = {
+  type: OrderDiscountType;
+  input_amount_yen: number | null;
+  rate_basis_points: number | null;
+  pre_discount_total_yen: number;
+  discount_amount_yen: number;
+  total_amount_yen: number;
+  error: string | null;
+};
+
 const QUANTITY_SCALE = 1000;
 const MAX_QUANTITY_MILLI = 9_999_999;
 const MAX_MONEY_YEN = 99_999_999;
@@ -54,6 +66,59 @@ function roundDivision(numerator: bigint, denominator: bigint, mode: TaxRounding
   if (mode === 'floor' || remainder === 0n) return quotient;
   if (mode === 'ceil') return quotient + 1n;
   return remainder * 2n >= denominator ? quotient + 1n : quotient;
+}
+
+export function parseDiscountRateBasisPoints(value: string): number | null {
+  const normalized = value.replace(/[%％\s]/g, '');
+  if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) return null;
+  const [integerPart, decimalPart = ''] = normalized.split('.');
+  const basisPoints = Number(integerPart) * 100 + Number((decimalPart + '00').slice(0, 2));
+  return Number.isSafeInteger(basisPoints) && basisPoints >= 0 && basisPoints <= 10_000 ? basisPoints : null;
+}
+
+export function formatDiscountRate(rateBasisPoints: number): string {
+  const integerPart = Math.floor(rateBasisPoints / 100);
+  const decimalPart = String(rateBasisPoints % 100).padStart(2, '0').replace(/0+$/, '');
+  return decimalPart ? `${integerPart}.${decimalPart}` : String(integerPart);
+}
+
+/** 税計算後の会計合計に、金額または割合のどちらか一方の割引を適用する。 */
+export function calculateOrderDiscount(
+  preDiscountTotalYen: number,
+  amountInput: string,
+  rateInput: string,
+  roundingMode: TaxRoundingMode,
+): OrderDiscountCalculation {
+  const amountText = amountInput.trim();
+  const rateText = rateInput.trim();
+  const base = assertSafeYen(preDiscountTotalYen);
+  const none = (error: string | null = null): OrderDiscountCalculation => ({
+    type: 'none', input_amount_yen: null, rate_basis_points: null,
+    pre_discount_total_yen: base, discount_amount_yen: 0, total_amount_yen: base, error,
+  });
+
+  if (amountText && rateText) return none('割引金額と割引率は同時に入力できません。');
+  if (!amountText && !rateText) return none();
+
+  if (amountText) {
+    const amountYen = parseYen(amountText);
+    if (amountYen === null) return none('割引金額は0〜99,999,999円の整数で入力してください。');
+    if (amountYen > base) return none('割引金額は割引前合計以下で入力してください。');
+    return {
+      type: 'amount', input_amount_yen: amountYen, rate_basis_points: null,
+      pre_discount_total_yen: base, discount_amount_yen: amountYen,
+      total_amount_yen: base - amountYen, error: null,
+    };
+  }
+
+  const rateBasisPoints = parseDiscountRateBasisPoints(rateText);
+  if (rateBasisPoints === null) return none('割引率は0〜100%（小数第2位まで）で入力してください。');
+  const discountAmountYen = toSafeYen(roundDivision(BigInt(base) * BigInt(rateBasisPoints), 10_000n, roundingMode));
+  return {
+    type: 'rate', input_amount_yen: null, rate_basis_points: rateBasisPoints,
+    pre_discount_total_yen: base, discount_amount_yen: discountAmountYen,
+    total_amount_yen: base - discountAmountYen, error: null,
+  };
 }
 
 export function parseQuantity(value: string): number | null {
