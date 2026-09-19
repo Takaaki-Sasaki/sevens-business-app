@@ -742,6 +742,11 @@ h2 { font-size: 21px; }
 .sale-cancel-action .field span { display: block; margin-bottom: 6px; color: #aba292; font-size: 11px; }
 .sale-cancel-action .field input { min-height: 38px; }
 .sale-cancel-action .danger-button { min-height: 42px; white-space: nowrap; }
+.permanent-delete-action { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 20px; padding: 15px; border: 1px solid rgba(203, 95, 78, .36); border-radius: 9px; background: rgba(185, 68, 52, .08); }
+.permanent-delete-action > div { display: grid; gap: 4px; }
+.permanent-delete-action strong { color: #e5a295; font-size: 12px; }
+.permanent-delete-action small { color: #ae978f; font-size: 10px; line-height: 1.5; }
+.permanent-delete-action .danger-button { flex: 0 0 auto; min-height: 42px; white-space: nowrap; }
 
 .invoice-workspace { display: grid; grid-template-columns: minmax(300px, .68fr) minmax(560px, 1.32fr); align-items: start; gap: 18px; }
 .invoice-list-panel { position: sticky; top: 24px; overflow: hidden; }
@@ -909,6 +914,8 @@ h2 { font-size: 21px; }
   .sale-invoice-action .secondary-button { width: 100%; }
   .sale-cancel-action { align-items: stretch; flex-direction: column; }
   .sale-cancel-action .danger-button { width: 100%; }
+  .permanent-delete-action { align-items: stretch; flex-direction: column; }
+  .permanent-delete-action .danger-button { width: 100%; }
   .invoice-workspace { display: block; }
   .invoice-list-panel { position: static; margin-bottom: 13px; }
   .invoice-list { max-height: 370px; }

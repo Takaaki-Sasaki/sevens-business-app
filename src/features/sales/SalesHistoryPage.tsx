@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Profile } from '../auth/types';
 import { listPaymentMethods } from '../products/productApi';
-import { cancelSale, getSaleDetail, listSaleOperators, listSales } from './saleApi';
+import { cancelSale, deleteSalePermanently, getSaleDetail, listSaleOperators, listSales } from './saleApi';
 import { SaleDetailPanel } from './SaleDetailPanel';
 import type { Sale, SaleDetail, SaleFilters, SaleOperator } from './types';
 import type { PaymentMethod } from '../products/types';
@@ -30,6 +30,7 @@ export function SalesHistoryPage({ profile }: { profile: Profile }) {
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [invoiceCreating, setInvoiceCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -119,6 +120,22 @@ export function SalesHistoryPage({ profile }: { profile: Profile }) {
     }
   }
 
+  async function handleDelete() {
+    if (!detail) return;
+    setDeleting(true);
+    setError(null);
+    try {
+      await deleteSalePermanently(detail.sale.id);
+      setSelectedSaleId(undefined);
+      setDetail(undefined);
+      setRefreshKey((value) => value + 1);
+    } catch (caught) {
+      setError(toUserMessage(caught, { fallback: '売上データを完全削除できませんでした。', retryAction: '完全削除を実行' }));
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <section className="page-view sales-page" aria-labelledby="sales-page-title">
       <header className="page-header">
@@ -156,7 +173,7 @@ export function SalesHistoryPage({ profile }: { profile: Profile }) {
             ))}
           </div>
         </section>
-        <SaleDetailPanel detail={detail} loading={detailLoading} profile={profile} onCancel={handleCancel} cancelling={cancelling} onCreateInvoice={handleCreateInvoice} invoiceCreating={invoiceCreating} />
+        <SaleDetailPanel detail={detail} loading={detailLoading} profile={profile} onCancel={handleCancel} cancelling={cancelling} onCreateInvoice={handleCreateInvoice} invoiceCreating={invoiceCreating} onDelete={handleDelete} deleting={deleting} />
       </div>
     </section>
   );

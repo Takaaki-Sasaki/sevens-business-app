@@ -7,6 +7,9 @@ describe('権限マトリクス', () => {
     expect(hasPermission('admin', 'pos.price_override')).toBe(true);
     expect(hasPermission('admin', 'settings.write')).toBe(true);
     expect(hasPermission('admin', 'sales.cancel')).toBe(true);
+    expect(hasPermission('admin', 'sales.delete')).toBe(true);
+    expect(hasPermission('admin', 'invoices.delete')).toBe(true);
+    expect(hasPermission('admin', 'users.manage')).toBe(true);
   });
 
   it('staffは会計と顧客登録はできるが、価格変更や売上取消はできない', () => {
@@ -15,6 +18,9 @@ describe('権限マトリクス', () => {
     expect(hasPermission('staff', 'products.write')).toBe(false);
     expect(hasPermission('staff', 'pos.price_override')).toBe(false);
     expect(hasPermission('staff', 'sales.cancel')).toBe(false);
+    expect(hasPermission('staff', 'sales.delete')).toBe(false);
+    expect(hasPermission('staff', 'invoices.delete')).toBe(false);
     expect(hasPermission('staff', 'settings.write')).toBe(false);
+    expect(hasPermission('staff', 'users.manage')).toBe(false);
   });
 });

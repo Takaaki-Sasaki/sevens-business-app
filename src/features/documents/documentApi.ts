@@ -1,6 +1,7 @@
 import { requireSupabase } from '../../shared/lib/supabase';
 import { getInvoiceDetail } from '../invoices/invoiceApi';
 import { getSaleDetail } from '../sales/saleApi';
+import { formatVehicleSelectionLabel } from '../customers/vehicleDisplay';
 import { documentTypes, type DocumentData, type DocumentSource, type DocumentSourceKind, type DocumentType, type OrganizationSettings } from './types';
 
 const settingsFields = 'organization_id, issuer_name, postal_code, address1, address2, phone, fax, bank_information, invoice_number_prefix, sale_number_prefix, tax_rounding_mode, updated_at';
@@ -70,11 +71,14 @@ export async function createDocumentData(input: { organizationId: string; kind: 
   if (!meta) throw new Error('帳票種別が不正です。');
   if (input.kind === 'invoice') {
     const detail = await getInvoiceDetail(input.organizationId, input.sourceId);
+    const linkedSale = detail.invoice.source_sale_id
+      ? await getSaleDetail(input.organizationId, detail.invoice.source_sale_id)
+      : undefined;
     return {
       sourceKind: 'invoice', sourceId: detail.invoice.id, sourceNumber: detail.invoice.invoice_number,
       documentType: input.documentType, documentTitle: meta.title,
       customerName: detail.invoice.customer_name_snapshot || '',
-      subject: detail.invoice.subject || '', issueDate: localDate(), paymentDueDate: detail.invoice.due_date,
+      vehicleName: formatVehicleSelectionLabel(linkedSale?.vehicle), issueDate: localDate(), paymentDueDate: detail.invoice.due_date,
       bankInformation: input.issuer.bank_information,
       issuer: input.issuer,
       lines: detail.items.map((item) => ({ name: item.item_name_snapshot, quantity: item.quantity, unitPriceYen: item.unit_price_yen, amountYen: item.line_total_yen })),
@@ -92,7 +96,7 @@ export async function createDocumentData(input: { organizationId: string; kind: 
     sourceKind: 'sale', sourceId: detail.sale.id, sourceNumber: detail.sale.sale_number,
     documentType: input.documentType, documentTitle: meta.title,
     customerName: detail.sale.customer_name_snapshot || '一般客',
-    subject: `売上 ${detail.sale.sale_number} 分`, issueDate: localDate(), paymentDueDate: null,
+    vehicleName: formatVehicleSelectionLabel(detail.vehicle), issueDate: localDate(), paymentDueDate: null,
     bankInformation: null,
     issuer: input.issuer,
     lines: detail.items.map((item) => ({ name: item.product_name_snapshot, quantity: item.quantity, unitPriceYen: item.unit_price_yen, amountYen: item.line_total_yen })),

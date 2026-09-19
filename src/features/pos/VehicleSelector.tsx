@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { listVehicles } from '../customers/customerApi';
 import type { Customer, Vehicle } from '../customers/types';
+import { formatVehicleSelectionLabel } from '../customers/vehicleDisplay';
 
 type VehicleSelectorProps = {
   organizationId: string;
@@ -36,7 +37,7 @@ export function VehicleSelector({ organizationId, customer, selectedVehicleId, o
       <select value={selectedVehicleId || ''} onChange={(event) => onChange(event.target.value || undefined)}>
         <option value="">車両を選択しない</option>
         {vehicles.map((vehicle) => (
-          <option key={vehicle.id} value={vehicle.id}>{vehicle.registration_number || 'ナンバー未登録'}{vehicle.model_name ? ` / ${vehicle.model_name}` : ''}</option>
+          <option key={vehicle.id} value={vehicle.id}>{formatVehicleSelectionLabel(vehicle)}</option>
         ))}
       </select>
     </label>

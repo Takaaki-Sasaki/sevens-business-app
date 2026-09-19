@@ -57,7 +57,7 @@ export function documentMarkup(data: DocumentData): string {
   const issuer = escapeHtml(data.issuer.issuer_name || 'SEVENS');
   const postal = escapeHtml(data.issuer.postal_code ? `〒${data.issuer.postal_code}` : '');
   const address = issuerAddress(data);
-  const subject = escapeHtml(data.subject || '');
+  const vehicleName = escapeHtml(data.vehicleName || '');
   const due = escapeHtml(formatDate(data.paymentDueDate));
   const bank = escapeHtml(data.bankInformation || '');
   const displayedSubtotalYen = Math.max(0, data.preOrderDiscountTotalYen - data.taxAmountYen);
@@ -69,7 +69,7 @@ export function documentMarkup(data: DocumentData): string {
     <section class="doc-recipient"><span>${recipient}</span><span>${recipientSuffix}</span></section>
     <section class="doc-issuer"><strong>${issuer}</strong><span>${postal}</span><span>${address}</span><span>${data.issuer.phone ? `TEL：${escapeHtml(data.issuer.phone)}` : ''}</span><span>${data.issuer.fax ? `FAX：${escapeHtml(data.issuer.fax)}` : ''}</span></section>
     <p class="doc-message">${messageFor(data.documentType)}</p>
-    <dl class="doc-meta"><div><dt>件名：</dt><dd>${subject}</dd></div><div><dt>${data.documentType === 'receipt' ? '領収日：' : '支払期限：'}</dt><dd>${data.documentType === 'receipt' ? escapeHtml(formatDate(data.issueDate)) : due}</dd></div>${showBank ? `<div><dt>振込先：</dt><dd class="doc-bank">${bank}</dd></div>` : ''}</dl>
+    <dl class="doc-meta"><div><dt>車両：</dt><dd>${vehicleName}</dd></div><div><dt>${data.documentType === 'receipt' ? '領収日：' : '支払期限：'}</dt><dd>${data.documentType === 'receipt' ? escapeHtml(formatDate(data.issueDate)) : due}</dd></div>${showBank ? `<div><dt>振込先：</dt><dd class="doc-bank">${bank}</dd></div>` : ''}</dl>
     <section class="doc-total"><span>${amountLabelFor(data.documentType)}</span><strong>${escapeHtml(formatYen(data.totalAmountYen))}</strong></section>
     <section class="doc-items"><img class="doc-watermark" src="${logo}" alt=""><table><thead><tr><th>内容</th><th>数量</th><th>単価</th><th>金額</th></tr></thead><tbody>${itemRows}</tbody><tfoot><tr><td class="doc-spacer" colspan="2" rowspan="4"></td><th>小計</th><td>${escapeHtml(formatYen(displayedSubtotalYen))}</td></tr><tr><th>消費税</th><td>${escapeHtml(formatYen(data.taxAmountYen))}</td></tr><tr><th>${discountLabel}</th><td>${escapeHtml(formatDiscountYen(data.orderDiscountAmountYen))}</td></tr><tr><th>合計</th><td>${escapeHtml(formatYen(data.totalAmountYen))}</td></tr></tfoot></table></section>
     <img class="doc-footer-logo" src="${logo}" alt="SEVENS">

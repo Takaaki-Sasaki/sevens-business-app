@@ -8,11 +8,12 @@ type InvoiceDetailPanelProps = {
   detail?: InvoiceDetail;
   loading: boolean;
   profile: Profile;
-  pendingAction?: 'issue' | 'paid' | 'cancel';
+  pendingAction?: 'issue' | 'paid' | 'cancel' | 'delete';
   onEdit: () => void;
   onIssue: () => Promise<void>;
   onMarkPaid: () => Promise<void>;
   onCancel: (reason: string) => Promise<void>;
+  onDelete: () => Promise<void>;
 };
 
 function displayedStatus(detail: InvoiceDetail): InvoiceStatus {
@@ -29,14 +30,20 @@ function formatQuantity(value: number): string {
   return Number.isInteger(value) ? value.toLocaleString() : value.toLocaleString(undefined, { maximumFractionDigits: 3 });
 }
 
-export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, onEdit, onIssue, onMarkPaid, onCancel }: InvoiceDetailPanelProps) {
+export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, onEdit, onIssue, onMarkPaid, onCancel, onDelete }: InvoiceDetailPanelProps) {
   const [reason, setReason] = useState('');
   const canWrite = hasPermission(profile.role, 'invoices.write');
+  const canDelete = hasPermission(profile.role, 'invoices.delete');
 
   async function cancel() {
     if (!detail || !window.confirm(`請求 ${detail.invoice.invoice_number} を取り消しますか？\n請求データは履歴として保持されます。`)) return;
     await onCancel(reason);
     setReason('');
+  }
+
+  async function deletePermanently() {
+    if (!detail || !window.confirm(`請求 ${detail.invoice.invoice_number} を完全に削除しますか？\n明細と帳票発行履歴も削除され、元に戻せません。`)) return;
+    await onDelete();
   }
 
   if (loading) return <section className="panel invoice-detail-panel invoice-detail-placeholder"><p>請求詳細を読み込んでいます…</p></section>;
@@ -69,6 +76,7 @@ export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, on
         <dl className="invoice-totals"><div><dt>小計</dt><dd>¥{invoice.subtotal_yen.toLocaleString()}</dd></div>{lineDiscountYen > 0 && <div><dt>明細割引</dt><dd>−¥{lineDiscountYen.toLocaleString()}</dd></div>}<div><dt>消費税</dt><dd>¥{invoice.tax_amount_yen.toLocaleString()}</dd></div><div><dt>割引前合計</dt><dd>¥{invoice.pre_order_discount_total_yen.toLocaleString()}</dd></div><div><dt>{orderDiscountLabel}</dt><dd>{invoice.order_discount_amount_yen ? `−¥${invoice.order_discount_amount_yen.toLocaleString()}` : '¥0'}</dd></div><div className="grand"><dt>請求金額</dt><dd>¥{invoice.total_amount_yen.toLocaleString()}</dd></div></dl>
         {invoice.status === 'cancelled' && <p className="invoice-cancelled-note">取消日時：{invoice.cancelled_at ? new Date(invoice.cancelled_at).toLocaleString('ja-JP') : '—'}{invoice.cancellation_reason ? ` ／ 理由：${invoice.cancellation_reason}` : ''}</p>}
         {canWrite && invoice.status !== 'cancelled' && invoice.status !== 'paid' && <div className="invoice-actions">{canEdit && <button type="button" className="secondary-button" disabled={!!pendingAction} onClick={onEdit}>請求を編集</button>}{invoice.status === 'draft' && <button type="button" className="primary-button" disabled={!!pendingAction} onClick={() => void onIssue()}>{pendingAction === 'issue' ? '発行中…' : '請求を発行済みにする'}</button>}{invoice.status === 'issued' && <button type="button" className="primary-button" disabled={!!pendingAction} onClick={() => void onMarkPaid()}>{pendingAction === 'paid' ? '登録中…' : '入金済みにする'}</button>}<label className="field"><span>取消理由（任意）</span><input value={reason} maxLength={500} placeholder="例：内容誤りのため" onChange={(event) => setReason(event.target.value)} /></label><button type="button" className="danger-button" disabled={!!pendingAction} onClick={() => void cancel()}>{pendingAction === 'cancel' ? '取消中…' : '請求を取消'}</button></div>}
+        {canDelete && <div className="permanent-delete-action"><div><strong>請求データの完全削除</strong><small>明細と帳票発行履歴を含めて削除します。この操作は元に戻せません。</small></div><button type="button" className="danger-button" disabled={!!pendingAction} onClick={() => void deletePermanently()}>{pendingAction === 'delete' ? '完全削除中…' : '請求を完全削除'}</button></div>}
       </div>
     </section>
   );

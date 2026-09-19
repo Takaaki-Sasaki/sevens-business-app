@@ -142,3 +142,9 @@ export async function cancelInvoice(invoiceId: string, reason: string): Promise<
   if (error) throw error;
   return data as InvoiceLink;
 }
+
+export async function deleteInvoicePermanently(invoiceId: string): Promise<{ invoice_id: string; invoice_number: string; deleted: true }> {
+  const { data, error } = await requireSupabase().rpc('delete_invoice_permanently', { p_invoice_id: invoiceId });
+  if (error) throw error;
+  return data as { invoice_id: string; invoice_number: string; deleted: true };
+}

@@ -6,21 +6,23 @@ export type Permission =
   | 'pos.price_override'
   | 'sales.read'
   | 'sales.cancel'
+  | 'sales.delete'
   | 'customers.read'
   | 'customers.write'
   | 'products.read'
   | 'products.write'
   | 'invoices.read'
   | 'invoices.write'
+  | 'invoices.delete'
   | 'documents.create'
   | 'settings.write'
   | 'users.manage';
 
 const permissionsByRole: Record<AppRole, ReadonlySet<Permission>> = {
   admin: new Set([
-    'dashboard.read', 'pos.use', 'pos.price_override', 'sales.read', 'sales.cancel',
+    'dashboard.read', 'pos.use', 'pos.price_override', 'sales.read', 'sales.cancel', 'sales.delete',
     'customers.read', 'customers.write', 'products.read', 'products.write',
-    'invoices.read', 'invoices.write', 'documents.create',
+    'invoices.read', 'invoices.write', 'invoices.delete', 'documents.create',
     'settings.write', 'users.manage',
   ]),
   staff: new Set([

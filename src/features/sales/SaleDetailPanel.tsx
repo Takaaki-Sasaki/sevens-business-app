@@ -13,6 +13,8 @@ type SaleDetailPanelProps = {
   cancelling: boolean;
   onCreateInvoice: (input: CreateInvoiceFromSaleInput) => Promise<void>;
   invoiceCreating: boolean;
+  onDelete: () => Promise<void>;
+  deleting: boolean;
 };
 
 function formatQuantity(quantity: number): string {
@@ -25,12 +27,13 @@ function formatVehicle(detail: SaleDetail): string {
   return parts.join(' / ') || 'ナンバー未登録の車両';
 }
 
-export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling, onCreateInvoice, invoiceCreating }: SaleDetailPanelProps) {
+export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling, onCreateInvoice, invoiceCreating, onDelete, deleting }: SaleDetailPanelProps) {
   const [reason, setReason] = useState('');
   const [invoiceSubject, setInvoiceSubject] = useState('');
   const [billingMonth, setBillingMonth] = useState('');
   const [dueDate, setDueDate] = useState('');
   const canCancel = !!detail && detail.sale.status === 'confirmed' && hasPermission(profile.role, 'sales.cancel');
+  const canDelete = !!detail && hasPermission(profile.role, 'sales.delete');
   const canCreateInvoice = !!detail && detail.sale.status === 'confirmed' && !detail.invoice && hasPermission(profile.role, 'invoices.write');
 
   useEffect(() => {
@@ -55,6 +58,11 @@ export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling
       billingMonth: billingMonth ? `${billingMonth}-01` : undefined,
       dueDate: dueDate || undefined,
     });
+  }
+
+  async function handleDelete() {
+    if (!detail || !window.confirm(`売上 ${detail.sale.sale_number} を完全に削除しますか？\n明細・支払・帳票発行履歴も削除され、元に戻せません。\n紐づく請求がある場合は、先に請求を完全削除してください。`)) return;
+    await onDelete();
   }
 
   if (loading) {
@@ -148,6 +156,12 @@ export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling
               <input value={reason} maxLength={500} placeholder="例：入力誤りのため" onChange={(event) => setReason(event.target.value)} />
             </label>
             <button type="button" className="danger-button" disabled={cancelling} onClick={() => void handleCancel()}>{cancelling ? '取り消し中…' : 'この売上を取消'}</button>
+          </div>
+        )}
+        {canDelete && (
+          <div className="permanent-delete-action">
+            <div><strong>売上データの完全削除</strong><small>明細・支払・帳票発行履歴を含めて削除します。この操作は元に戻せません。</small></div>
+            <button type="button" className="danger-button" disabled={deleting || cancelling || invoiceCreating} onClick={() => void handleDelete()}>{deleting ? '完全削除中…' : '売上を完全削除'}</button>
           </div>
         )}
       </div>

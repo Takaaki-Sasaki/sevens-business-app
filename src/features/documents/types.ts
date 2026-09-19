@@ -48,7 +48,7 @@ export type DocumentData = {
   documentType: DocumentType;
   documentTitle: string;
   customerName: string;
-  subject: string;
+  vehicleName: string;
   issueDate: string;
   paymentDueDate: string | null;
   bankInformation: string | null;

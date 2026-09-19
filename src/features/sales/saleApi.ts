@@ -151,3 +151,9 @@ export async function cancelSale(saleId: string, reason: string): Promise<{ sale
   if (error) throw error;
   return data as { sale_id: string; sale_number: string; status: 'cancelled' };
 }
+
+export async function deleteSalePermanently(saleId: string): Promise<{ sale_id: string; sale_number: string; deleted: true }> {
+  const { data, error } = await requireSupabase().rpc('delete_sale_permanently', { p_sale_id: saleId });
+  if (error) throw error;
+  return data as { sale_id: string; sale_number: string; deleted: true };
+}
