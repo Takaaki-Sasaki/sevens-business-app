@@ -52,6 +52,7 @@ export type DocumentData = {
   issueDate: string;
   paymentDueDate: string | null;
   bankInformation: string | null;
+  notes: string;
   issuer: OrganizationSettings;
   lines: DocumentLine[];
   subtotalYen: number;

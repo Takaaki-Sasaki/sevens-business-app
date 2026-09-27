@@ -11,6 +11,8 @@ type PaymentPanelProps = {
   discountRateInput: string;
   onDiscountAmountChange: (value: string) => void;
   onDiscountRateChange: (value: string) => void;
+  notesInput: string;
+  onNotesChange: (value: string) => void;
   orderDiscount: OrderDiscountCalculation;
   onCheckout: () => void;
   checkoutPending: boolean;
@@ -20,6 +22,7 @@ type PaymentPanelProps = {
 export function PaymentPanel({
   methods, selectedMethodId, onMethodChange, amountReceivedInput, onAmountReceivedChange,
   discountAmountInput, discountRateInput, onDiscountAmountChange, onDiscountRateChange, orderDiscount,
+  notesInput, onNotesChange,
   onCheckout, checkoutPending, checkoutDisabled,
 }: PaymentPanelProps) {
   const selectedMethod = methods.find((method) => method.id === selectedMethodId);
@@ -85,6 +88,19 @@ export function PaymentPanel({
             <strong>{orderDiscount.discount_amount_yen ? `−¥${orderDiscount.discount_amount_yen.toLocaleString()}` : '¥0'}</strong>
           </p>
         )}
+      </section>
+      <section className="pos-notes">
+        <label className="field">
+          <span>備考（任意）</span>
+          <textarea
+            rows={3}
+            maxLength={5000}
+            placeholder="帳票へ記載するコメントなどを入力"
+            value={notesInput}
+            onChange={(event) => onNotesChange(event.target.value)}
+          />
+        </label>
+        <small>{notesInput.length.toLocaleString()} / 5,000文字</small>
       </section>
       {isCash && (
         <div className="cash-settlement">

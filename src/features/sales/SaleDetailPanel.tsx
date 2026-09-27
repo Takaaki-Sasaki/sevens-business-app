@@ -93,6 +93,7 @@ export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling
           <div><dt>車両</dt><dd>{formatVehicle(detail)}</dd></div>
           <div><dt>会計時刻</dt><dd>{sale.confirmed_at ? new Date(sale.confirmed_at).toLocaleString('ja-JP') : '—'}</dd></div>
         </dl>
+        {sale.notes && <section className="record-notes"><strong>備考</strong><p>{sale.notes}</p></section>}
 
         <div className="sale-item-table-wrap">
           <table className="sale-item-table">

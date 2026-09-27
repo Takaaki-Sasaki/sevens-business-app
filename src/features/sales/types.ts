@@ -8,6 +8,7 @@ export type Sale = {
   customer_name_snapshot: string | null;
   vehicle_id: string | null;
   sale_date: string;
+  notes: string | null;
   subtotal_yen: number;
   tax_amount_yen: number;
   pre_order_discount_total_yen: number;
@@ -68,6 +69,7 @@ export type SaleCheckoutResult = {
   total_amount_yen: number;
   change_amount_yen: number;
   status: 'confirmed';
+  notes: string | null;
   invoice: InvoiceLink;
 };
 

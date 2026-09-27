@@ -36,6 +36,7 @@ export function PosPage({ profile }: { profile: Profile }) {
   const [amountReceivedInput, setAmountReceivedInput] = useState('');
   const [discountAmountInput, setDiscountAmountInput] = useState('');
   const [discountRateInput, setDiscountRateInput] = useState('');
+  const [notesInput, setNotesInput] = useState('');
   const [isCustomerFormOpen, setCustomerFormOpen] = useState(false);
   const [isOtherItemFormOpen, setOtherItemFormOpen] = useState(false);
   const [checkoutKey, setCheckoutKey] = useState(() => crypto.randomUUID());
@@ -144,6 +145,7 @@ export function PosPage({ profile }: { profile: Profile }) {
         amountReceivedYen: selectedPaymentMethod.code === 'cash' ? (amountReceivedYen ?? 0) : undefined,
         orderDiscountAmountYen: orderDiscount.type === 'amount' ? orderDiscount.input_amount_yen ?? 0 : undefined,
         orderDiscountRateBasisPoints: orderDiscount.type === 'rate' ? orderDiscount.rate_basis_points ?? 0 : undefined,
+        notes: notesInput,
         lines: cartLines,
       });
       setCompletedSale(result);
@@ -151,6 +153,7 @@ export function PosPage({ profile }: { profile: Profile }) {
       setAmountReceivedInput('');
       setDiscountAmountInput('');
       setDiscountRateInput('');
+      setNotesInput('');
       setMobileCartOpen(false);
       invalidateCheckout();
     } catch (caught) {
@@ -265,6 +268,12 @@ export function PosPage({ profile }: { profile: Profile }) {
             onDiscountRateChange={(value) => {
               if (isCheckingOut) return;
               setDiscountRateInput(value);
+              invalidateCheckout();
+            }}
+            notesInput={notesInput}
+            onNotesChange={(value) => {
+              if (isCheckingOut) return;
+              setNotesInput(value);
               invalidateCheckout();
             }}
             orderDiscount={orderDiscount}

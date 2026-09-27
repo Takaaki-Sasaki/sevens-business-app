@@ -21,6 +21,7 @@ describe('売上確定リクエスト', () => {
       vehicleId: '955a9bfa-b777-4ebc-889a-f17fb508e5c4',
       paymentMethodId: '4f9d5ac3-976c-4b10-a97c-0d0f60e351f8',
       amountReceivedYen: 5000,
+      notes: '  作業後に空気圧を再確認\nお客様へ説明済み  ',
       lines: [line],
     });
 
@@ -32,6 +33,7 @@ describe('売上確定リクエスト', () => {
       p_amount_received_yen: 5000,
       p_order_discount_amount_yen: null,
       p_order_discount_rate_basis_points: null,
+      p_notes: '作業後に空気圧を再確認\nお客様へ説明済み',
       p_lines: [{ product_id: product.id, quantity_milli: 2500, unit_price_yen: 1800, discount_yen: 100 }],
     });
     expect(payload.p_sale_date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
@@ -51,6 +53,7 @@ describe('売上確定リクエスト', () => {
     expect(payload.p_create_invoice).toBe(true);
     expect(payload.p_order_discount_amount_yen).toBeNull();
     expect(payload.p_order_discount_rate_basis_points).toBeNull();
+    expect(payload.p_notes).toBeNull();
   });
 
   it('会計全体の金額割引または割合割引をRPCへ渡す', () => {

@@ -25,6 +25,7 @@ export type Invoice = {
   payment_method_id: string | null;
   payment_method_name_snapshot: string | null;
   subject: string | null;
+  notes: string | null;
   billing_month: string | null;
   due_date: string | null;
   subtotal_yen: number;
