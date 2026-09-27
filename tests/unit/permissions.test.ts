@@ -8,6 +8,8 @@ describe('権限マトリクス', () => {
     expect(hasPermission('admin', 'settings.write')).toBe(true);
     expect(hasPermission('admin', 'sales.cancel')).toBe(true);
     expect(hasPermission('admin', 'sales.delete')).toBe(true);
+    expect(hasPermission('admin', 'sales.notes.update')).toBe(true);
+    expect(hasPermission('admin', 'invoices.notes.update')).toBe(true);
     expect(hasPermission('admin', 'invoices.delete')).toBe(true);
     expect(hasPermission('admin', 'users.manage')).toBe(true);
   });
@@ -19,6 +21,8 @@ describe('権限マトリクス', () => {
     expect(hasPermission('staff', 'pos.price_override')).toBe(false);
     expect(hasPermission('staff', 'sales.cancel')).toBe(false);
     expect(hasPermission('staff', 'sales.delete')).toBe(false);
+    expect(hasPermission('staff', 'sales.notes.update')).toBe(true);
+    expect(hasPermission('staff', 'invoices.notes.update')).toBe(true);
     expect(hasPermission('staff', 'invoices.delete')).toBe(false);
     expect(hasPermission('staff', 'settings.write')).toBe(false);
     expect(hasPermission('staff', 'users.manage')).toBe(false);

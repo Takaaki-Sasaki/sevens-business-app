@@ -9,6 +9,8 @@ type SaleDetailPanelProps = {
   detail?: SaleDetail;
   loading: boolean;
   profile: Profile;
+  onSaveNotes: (notes: string) => Promise<void>;
+  notesSaving: boolean;
   onCancel: (reason: string) => Promise<void>;
   cancelling: boolean;
   onCreateInvoice: (input: CreateInvoiceFromSaleInput) => Promise<void>;
@@ -27,14 +29,16 @@ function formatVehicle(detail: SaleDetail): string {
   return parts.join(' / ') || 'ナンバー未登録の車両';
 }
 
-export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling, onCreateInvoice, invoiceCreating, onDelete, deleting }: SaleDetailPanelProps) {
+export function SaleDetailPanel({ detail, loading, profile, onSaveNotes, notesSaving, onCancel, cancelling, onCreateInvoice, invoiceCreating, onDelete, deleting }: SaleDetailPanelProps) {
   const [reason, setReason] = useState('');
+  const [notesInput, setNotesInput] = useState('');
   const [invoiceSubject, setInvoiceSubject] = useState('');
   const [billingMonth, setBillingMonth] = useState('');
   const [dueDate, setDueDate] = useState('');
   const canCancel = !!detail && detail.sale.status === 'confirmed' && hasPermission(profile.role, 'sales.cancel');
   const canDelete = !!detail && hasPermission(profile.role, 'sales.delete');
   const canCreateInvoice = !!detail && detail.sale.status === 'confirmed' && !detail.invoice && hasPermission(profile.role, 'invoices.write');
+  const canUpdateNotes = hasPermission(profile.role, 'sales.notes.update');
 
   useEffect(() => {
     if (!detail) return;
@@ -42,6 +46,10 @@ export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling
     setBillingMonth(detail.sale.sale_date.slice(0, 7));
     setDueDate('');
   }, [detail?.sale.id]);
+
+  useEffect(() => {
+    setNotesInput(detail?.sale.notes || '');
+  }, [detail?.sale.id, detail?.sale.notes]);
 
   async function handleCancel() {
     if (!detail) return;
@@ -93,7 +101,18 @@ export function SaleDetailPanel({ detail, loading, profile, onCancel, cancelling
           <div><dt>車両</dt><dd>{formatVehicle(detail)}</dd></div>
           <div><dt>会計時刻</dt><dd>{sale.confirmed_at ? new Date(sale.confirmed_at).toLocaleString('ja-JP') : '—'}</dd></div>
         </dl>
-        {sale.notes && <section className="record-notes"><strong>備考</strong><p>{sale.notes}</p></section>}
+        {canUpdateNotes ? (
+          <section className="record-notes-editor" aria-labelledby="sale-notes-title">
+            <label className="field">
+              <span id="sale-notes-title">備考</span>
+              <textarea rows={4} maxLength={5000} value={notesInput} placeholder="帳票へ記載するコメントなどを入力" onChange={(event) => setNotesInput(event.target.value)} />
+            </label>
+            <div className="record-notes-actions">
+              <small>{notesInput.length.toLocaleString()} / 5,000文字{detail.invoice ? '　保存すると紐づく請求にも反映されます。' : ''}</small>
+              <button type="button" className="secondary-button" disabled={notesSaving || notesInput.trim() === (sale.notes || '')} onClick={() => void onSaveNotes(notesInput)}>{notesSaving ? '保存中…' : '備考を保存'}</button>
+            </div>
+          </section>
+        ) : sale.notes ? <section className="record-notes"><strong>備考</strong><p>{sale.notes}</p></section> : null}
 
         <div className="sale-item-table-wrap">
           <table className="sale-item-table">

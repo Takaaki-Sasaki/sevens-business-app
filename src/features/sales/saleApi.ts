@@ -154,6 +154,16 @@ export async function cancelSale(saleId: string, reason: string): Promise<{ sale
   return data as { sale_id: string; sale_number: string; status: 'cancelled' };
 }
 
+export function createSaleNotesPayload(saleId: string, notes: string) {
+  return { p_sale_id: saleId, p_notes: notes.trim() || null };
+}
+
+export async function updateSaleNotes(saleId: string, notes: string): Promise<{ sale_id: string; notes: string | null; synced_invoice_count: number }> {
+  const { data, error } = await requireSupabase().rpc('update_sale_notes', createSaleNotesPayload(saleId, notes));
+  if (error) throw error;
+  return data as { sale_id: string; notes: string | null; synced_invoice_count: number };
+}
+
 export async function deleteSalePermanently(saleId: string): Promise<{ sale_id: string; sale_number: string; deleted: true }> {
   const { data, error } = await requireSupabase().rpc('delete_sale_permanently', { p_sale_id: saleId });
   if (error) throw error;

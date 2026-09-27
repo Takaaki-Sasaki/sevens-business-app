@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createCheckoutPayload } from '../../src/features/sales/saleApi';
+import { createCheckoutPayload, createSaleNotesPayload } from '../../src/features/sales/saleApi';
 import { createCustomCartLine, type CartLine } from '../../src/features/pos/cart';
 import type { Product, TaxRate } from '../../src/features/products/types';
 
@@ -104,5 +104,13 @@ describe('売上確定リクエスト', () => {
       unit_price_yen: 3500,
       discount_yen: 0,
     }]);
+  });
+
+  it('売上備考は前後の空白を除去し、空欄はNULLとして送信する', () => {
+    expect(createSaleNotesPayload('sale-1', '  再点検済み\n引渡し時に説明  ')).toEqual({
+      p_sale_id: 'sale-1',
+      p_notes: '再点検済み\n引渡し時に説明',
+    });
+    expect(createSaleNotesPayload('sale-1', '   ')).toEqual({ p_sale_id: 'sale-1', p_notes: null });
   });
 });

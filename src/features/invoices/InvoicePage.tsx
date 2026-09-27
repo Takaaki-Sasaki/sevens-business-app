@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { hasPermission } from '../auth/permissions';
 import type { Profile } from '../auth/types';
-import { cancelInvoice, deleteInvoicePermanently, getInvoiceDetail, issueInvoice, listInvoices, markInvoicePaid } from './invoiceApi';
+import { cancelInvoice, deleteInvoicePermanently, getInvoiceDetail, issueInvoice, listInvoices, markInvoicePaid, updateInvoiceNotes } from './invoiceApi';
 import { InvoiceDetailPanel } from './InvoiceDetailPanel';
 import { InvoiceList } from './InvoiceList';
 import { ManualInvoiceForm } from './ManualInvoiceForm';
@@ -20,7 +20,7 @@ export function InvoicePage({ profile, filterRequest }: { profile: Profile; filt
   const [detail, setDetail] = useState<InvoiceDetail>();
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
-  const [pendingAction, setPendingAction] = useState<'issue' | 'paid' | 'cancel' | 'delete'>();
+  const [pendingAction, setPendingAction] = useState<'issue' | 'paid' | 'cancel' | 'delete' | 'notes'>();
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -80,13 +80,27 @@ export function InvoicePage({ profile, filterRequest }: { profile: Profile; filt
     }
   }
 
+  async function saveInvoiceNotes(notes: string) {
+    if (!selectedInvoiceId) return;
+    setPendingAction('notes');
+    setError(null);
+    try {
+      await updateInvoiceNotes(selectedInvoiceId, notes);
+      setRefreshKey((value) => value + 1);
+    } catch (caught) {
+      setError(toUserMessage(caught, { fallback: '備考を保存できませんでした。', retryAction: '備考を保存' }));
+    } finally {
+      setPendingAction(undefined);
+    }
+  }
+
   return (
     <section className="page-view invoices-page" aria-labelledby="invoices-page-title">
       <header className="page-header"><div><p className="eyebrow">INVOICE MANAGEMENT</p><h1 id="invoices-page-title">請求管理</h1><p className="page-description">売上から作成した請求と、手動登録した請求を一元管理します。</p></div></header>
       {error && <p className="form-error page-error" role="alert">{error}</p>}
       <div className="invoice-workspace">
         <InvoiceList invoices={invoices} filters={draftFilters} selectedId={selectedInvoiceId} loading={loading} onFiltersChange={setDraftFilters} onSearch={() => setActiveFilters({ ...draftFilters })} onClearFilters={() => { const defaults = createEmptyInvoiceFilters(); setDraftFilters(defaults); setActiveFilters(defaults); }} onSelect={(invoice) => setEditor({ kind: 'detail', invoice })} onCreate={() => setEditor({ kind: 'create' })} canCreate={canWrite} />
-        {(editor.kind === 'create' || editor.kind === 'edit') && canWrite ? <ManualInvoiceForm organizationId={profile.organization_id} invoiceDetail={editor.kind === 'edit' ? detail : undefined} onSaved={(invoiceId) => { const defaults = createEmptyInvoiceFilters(); setDraftFilters(defaults); setActiveFilters(defaults); setEditor({ kind: 'detail', invoice: { id: invoiceId } as Invoice }); setRefreshKey((value) => value + 1); }} /> : <InvoiceDetailPanel detail={detail} loading={detailLoading} profile={profile} pendingAction={pendingAction} onEdit={() => { if (editor.kind === 'detail' && editor.invoice) setEditor({ kind: 'edit', invoice: editor.invoice }); }} onIssue={() => runAction('issue', () => issueInvoice(selectedInvoiceId!))} onMarkPaid={() => runAction('paid', () => markInvoicePaid(selectedInvoiceId!))} onCancel={(reason) => runAction('cancel', () => cancelInvoice(selectedInvoiceId!, reason))} onDelete={deleteSelectedInvoice} />}
+        {(editor.kind === 'create' || editor.kind === 'edit') && canWrite ? <ManualInvoiceForm organizationId={profile.organization_id} invoiceDetail={editor.kind === 'edit' ? detail : undefined} onSaved={(invoiceId) => { const defaults = createEmptyInvoiceFilters(); setDraftFilters(defaults); setActiveFilters(defaults); setEditor({ kind: 'detail', invoice: { id: invoiceId } as Invoice }); setRefreshKey((value) => value + 1); }} /> : <InvoiceDetailPanel detail={detail} loading={detailLoading} profile={profile} pendingAction={pendingAction} onSaveNotes={saveInvoiceNotes} onEdit={() => { if (editor.kind === 'detail' && editor.invoice) setEditor({ kind: 'edit', invoice: editor.invoice }); }} onIssue={() => runAction('issue', () => issueInvoice(selectedInvoiceId!))} onMarkPaid={() => runAction('paid', () => markInvoicePaid(selectedInvoiceId!))} onCancel={(reason) => runAction('cancel', () => cancelInvoice(selectedInvoiceId!, reason))} onDelete={deleteSelectedInvoice} />}
       </div>
     </section>
   );

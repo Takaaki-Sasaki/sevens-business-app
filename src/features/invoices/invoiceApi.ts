@@ -143,6 +143,16 @@ export async function cancelInvoice(invoiceId: string, reason: string): Promise<
   return data as InvoiceLink;
 }
 
+export function createInvoiceNotesPayload(invoiceId: string, notes: string) {
+  return { p_invoice_id: invoiceId, p_notes: notes.trim() || null };
+}
+
+export async function updateInvoiceNotes(invoiceId: string, notes: string): Promise<{ invoice_id: string; notes: string | null; source_sale_id: string | null }> {
+  const { data, error } = await requireSupabase().rpc('update_invoice_notes', createInvoiceNotesPayload(invoiceId, notes));
+  if (error) throw error;
+  return data as { invoice_id: string; notes: string | null; source_sale_id: string | null };
+}
+
 export async function deleteInvoicePermanently(invoiceId: string): Promise<{ invoice_id: string; invoice_number: string; deleted: true }> {
   const { data, error } = await requireSupabase().rpc('delete_invoice_permanently', { p_invoice_id: invoiceId });
   if (error) throw error;

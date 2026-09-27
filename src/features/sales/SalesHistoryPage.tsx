@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Profile } from '../auth/types';
 import { listPaymentMethods } from '../products/productApi';
-import { cancelSale, deleteSalePermanently, getSaleDetail, listSaleOperators, listSales } from './saleApi';
+import { cancelSale, deleteSalePermanently, getSaleDetail, listSaleOperators, listSales, updateSaleNotes } from './saleApi';
 import { SaleDetailPanel } from './SaleDetailPanel';
 import type { Sale, SaleDetail, SaleFilters, SaleOperator } from './types';
 import type { PaymentMethod } from '../products/types';
@@ -32,6 +32,7 @@ export function SalesHistoryPage({ profile }: { profile: Profile }) {
   const [cancelling, setCancelling] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [invoiceCreating, setInvoiceCreating] = useState(false);
+  const [notesSaving, setNotesSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -136,6 +137,20 @@ export function SalesHistoryPage({ profile }: { profile: Profile }) {
     }
   }
 
+  async function handleSaveNotes(notes: string) {
+    if (!detail) return;
+    setNotesSaving(true);
+    setError(null);
+    try {
+      await updateSaleNotes(detail.sale.id, notes);
+      setRefreshKey((value) => value + 1);
+    } catch (caught) {
+      setError(toUserMessage(caught, { fallback: '備考を保存できませんでした。', retryAction: '備考を保存' }));
+    } finally {
+      setNotesSaving(false);
+    }
+  }
+
   return (
     <section className="page-view sales-page" aria-labelledby="sales-page-title">
       <header className="page-header">
@@ -173,7 +188,7 @@ export function SalesHistoryPage({ profile }: { profile: Profile }) {
             ))}
           </div>
         </section>
-        <SaleDetailPanel detail={detail} loading={detailLoading} profile={profile} onCancel={handleCancel} cancelling={cancelling} onCreateInvoice={handleCreateInvoice} invoiceCreating={invoiceCreating} onDelete={handleDelete} deleting={deleting} />
+        <SaleDetailPanel detail={detail} loading={detailLoading} profile={profile} onSaveNotes={handleSaveNotes} notesSaving={notesSaving} onCancel={handleCancel} cancelling={cancelling} onCreateInvoice={handleCreateInvoice} invoiceCreating={invoiceCreating} onDelete={handleDelete} deleting={deleting} />
       </div>
     </section>
   );

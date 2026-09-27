@@ -714,6 +714,13 @@ h2 { font-size: 21px; }
 .record-notes { margin: -4px 0 18px; padding: 12px; border: 1px solid #403a2f; border-radius: 8px; background: #1b1a16; }
 .record-notes strong { display: block; margin-bottom: 6px; color: #958d7e; font-size: 10px; }
 .record-notes p { margin: 0; color: #ded5c5; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; white-space: pre-wrap; }
+.record-notes-editor { display: grid; gap: 9px; margin: -4px 0 18px; padding: 12px; border: 1px solid #4a4334; border-radius: 8px; background: #1b1a16; }
+.record-notes-editor .field { display: grid; gap: 6px; color: #aaa292; font-size: 11px; }
+.record-notes-editor textarea { width: 100%; min-height: 90px; padding: 9px 10px; border: 1px solid #575143; border-radius: 7px; outline: none; color: #eee6d8; background: #151411; line-height: 1.6; resize: vertical; }
+.record-notes-editor textarea:focus { border-color: #d8a83f; box-shadow: 0 0 0 2px rgba(216, 168, 63, .14); }
+.record-notes-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.record-notes-actions small { color: #958d7e; font-size: 9px; line-height: 1.5; }
+.record-notes-actions .secondary-button { flex: 0 0 auto; min-height: 36px; padding: 7px 11px; font-size: 10px; }
 .sale-item-table-wrap { overflow: auto; border: 1px solid #403a2f; border-radius: 9px; }
 .sale-item-table { width: 100%; min-width: 580px; border-collapse: collapse; font-size: 11px; }
 .sale-item-table th { padding: 9px; border-bottom: 1px solid #4a4336; color: #a69e8f; background: #1a1915; font-size: 10px; text-align: right; white-space: nowrap; }
@@ -1018,6 +1025,8 @@ h2 { font-size: 21px; }
   .order-discount-heading { align-items: flex-start; flex-direction: column; gap: 3px; }
   .order-discount-heading small { text-align: left; }
   .order-discount-fields { grid-template-columns: minmax(0, 1fr); }
+  .record-notes-actions { align-items: stretch; flex-direction: column; }
+  .record-notes-actions .secondary-button { width: 100%; }
   .cash-result { text-align: left; }
   .cart-line-inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cart-line-inputs label:first-child { grid-column: span 2; }

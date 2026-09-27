@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { hasPermission } from '../auth/permissions';
 import type { Profile } from '../auth/types';
 import type { InvoiceDetail, InvoiceStatus } from './types';
@@ -8,7 +8,8 @@ type InvoiceDetailPanelProps = {
   detail?: InvoiceDetail;
   loading: boolean;
   profile: Profile;
-  pendingAction?: 'issue' | 'paid' | 'cancel' | 'delete';
+  pendingAction?: 'issue' | 'paid' | 'cancel' | 'delete' | 'notes';
+  onSaveNotes: (notes: string) => Promise<void>;
   onEdit: () => void;
   onIssue: () => Promise<void>;
   onMarkPaid: () => Promise<void>;
@@ -30,10 +31,16 @@ function formatQuantity(value: number): string {
   return Number.isInteger(value) ? value.toLocaleString() : value.toLocaleString(undefined, { maximumFractionDigits: 3 });
 }
 
-export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, onEdit, onIssue, onMarkPaid, onCancel, onDelete }: InvoiceDetailPanelProps) {
+export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, onSaveNotes, onEdit, onIssue, onMarkPaid, onCancel, onDelete }: InvoiceDetailPanelProps) {
   const [reason, setReason] = useState('');
+  const [notesInput, setNotesInput] = useState('');
   const canWrite = hasPermission(profile.role, 'invoices.write');
+  const canUpdateNotes = hasPermission(profile.role, 'invoices.notes.update');
   const canDelete = hasPermission(profile.role, 'invoices.delete');
+
+  useEffect(() => {
+    setNotesInput(detail?.invoice.notes || '');
+  }, [detail?.invoice.id, detail?.invoice.notes]);
 
   async function cancel() {
     if (!detail || !window.confirm(`請求 ${detail.invoice.invoice_number} を取り消しますか？\n請求データは履歴として保持されます。`)) return;
@@ -72,7 +79,18 @@ export function InvoiceDetailPanel({ detail, loading, profile, pendingAction, on
           <div><dt>元売上</dt><dd>{invoice.source_sale_id ? '売上データから作成' : '手動登録'}</dd></div>
           <div><dt>作成日時</dt><dd>{new Date(invoice.created_at).toLocaleString('ja-JP')}</dd></div>
         </dl>
-        {invoice.notes && <section className="record-notes"><strong>備考</strong><p>{invoice.notes}</p></section>}
+        {canUpdateNotes ? (
+          <section className="record-notes-editor" aria-labelledby="invoice-notes-title">
+            <label className="field">
+              <span id="invoice-notes-title">備考</span>
+              <textarea rows={4} maxLength={5000} value={notesInput} placeholder="帳票へ記載するコメントなどを入力" onChange={(event) => setNotesInput(event.target.value)} />
+            </label>
+            <div className="record-notes-actions">
+              <small>{notesInput.length.toLocaleString()} / 5,000文字{invoice.source_sale_id ? '　保存すると元売上にも反映されます。' : ''}</small>
+              <button type="button" className="secondary-button" disabled={!!pendingAction || notesInput.trim() === (invoice.notes || '')} onClick={() => void onSaveNotes(notesInput)}>{pendingAction === 'notes' ? '保存中…' : '備考を保存'}</button>
+            </div>
+          </section>
+        ) : invoice.notes ? <section className="record-notes"><strong>備考</strong><p>{invoice.notes}</p></section> : null}
         <div className="invoice-item-table-wrap"><table className="invoice-item-table"><thead><tr><th>明細</th><th>数量</th><th>単価</th><th>割引</th><th>税</th><th>金額</th></tr></thead><tbody>{items.map((item) => <tr key={item.id}><td><strong>{item.item_name_snapshot}</strong></td><td>{formatQuantity(item.quantity)}</td><td>¥{item.unit_price_yen.toLocaleString()}</td><td>{item.discount_yen ? `−¥${item.discount_yen.toLocaleString()}` : '—'}</td><td>¥{item.tax_amount_yen.toLocaleString()}</td><td><strong>¥{item.line_total_yen.toLocaleString()}</strong></td></tr>)}</tbody></table></div>
         <dl className="invoice-totals"><div><dt>小計</dt><dd>¥{invoice.subtotal_yen.toLocaleString()}</dd></div>{lineDiscountYen > 0 && <div><dt>明細割引</dt><dd>−¥{lineDiscountYen.toLocaleString()}</dd></div>}<div><dt>消費税</dt><dd>¥{invoice.tax_amount_yen.toLocaleString()}</dd></div><div><dt>割引前合計</dt><dd>¥{invoice.pre_order_discount_total_yen.toLocaleString()}</dd></div><div><dt>{orderDiscountLabel}</dt><dd>{invoice.order_discount_amount_yen ? `−¥${invoice.order_discount_amount_yen.toLocaleString()}` : '¥0'}</dd></div><div className="grand"><dt>請求金額</dt><dd>¥{invoice.total_amount_yen.toLocaleString()}</dd></div></dl>
         {invoice.status === 'cancelled' && <p className="invoice-cancelled-note">取消日時：{invoice.cancelled_at ? new Date(invoice.cancelled_at).toLocaleString('ja-JP') : '—'}{invoice.cancellation_reason ? ` ／ 理由：${invoice.cancellation_reason}` : ''}</p>}

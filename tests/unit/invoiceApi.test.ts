@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createInvoicePayload, createManualInvoicePayload, updateManualInvoicePayload } from '../../src/features/invoices/invoiceApi';
+import { createInvoiceNotesPayload, createInvoicePayload, createManualInvoicePayload, updateManualInvoicePayload } from '../../src/features/invoices/invoiceApi';
 import { createCheckoutPayload } from '../../src/features/sales/saleApi';
 import type { CartLine } from '../../src/features/pos/cart';
 import type { Product } from '../../src/features/products/types';
@@ -62,5 +62,13 @@ describe('売上から請求への変換リクエスト', () => {
     };
     expect(createManualInvoicePayload(input).p_customer_id).toBeNull();
     expect(updateManualInvoicePayload({ ...input, invoiceId: 'f8ad958d-7c61-43ea-aaf3-b0881ef7fc9e' }).p_customer_id).toBeNull();
+  });
+
+  it('請求備考は前後の空白を除去し、空欄はNULLとして送信する', () => {
+    expect(createInvoiceNotesPayload('invoice-1', '  お客様確認済み  ')).toEqual({
+      p_invoice_id: 'invoice-1',
+      p_notes: 'お客様確認済み',
+    });
+    expect(createInvoiceNotesPayload('invoice-1', '\n  ')).toEqual({ p_invoice_id: 'invoice-1', p_notes: null });
   });
 });
